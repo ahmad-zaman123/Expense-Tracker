@@ -1,0 +1,10 @@
+-r base.in
+
+black
+isort
+flake8
+pytest
+pytest-django
+pytest-cov
+django-extensions
+pip-tools

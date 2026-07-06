@@ -1,0 +1,8 @@
+Django>=4.2,<4.3
+djangorestframework
+djangorestframework-simplejwt
+django-environ
+django-filter
+drf-spectacular
+psycopg[binary]
+whitenoise
