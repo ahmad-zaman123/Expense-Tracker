@@ -7,6 +7,7 @@ import Budgets from "./pages/Budgets.jsx"
 import Dashboard from "./pages/Dashboard.jsx"
 import Landing from "./pages/Landing.jsx"
 import Login from "./pages/Login.jsx"
+import Recurring from "./pages/Recurring.jsx"
 import Register from "./pages/Register.jsx"
 import Transactions from "./pages/Transactions.jsx"
 import Transfers from "./pages/Transfers.jsx"
@@ -30,6 +31,7 @@ function App() {
         <Route path="transactions" element={<Transactions />} />
         <Route path="transfers" element={<Transfers />} />
         <Route path="budgets" element={<Budgets />} />
+        <Route path="recurring" element={<Recurring />} />
       </Route>
     </Routes>
   )
