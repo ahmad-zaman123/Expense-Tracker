@@ -1,6 +1,8 @@
+import { Link } from "react-router-dom"
+
 function Landing() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
       <div className="max-w-md text-center">
         <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-600 text-2xl font-bold text-white">
           ₨
@@ -10,7 +12,20 @@ function Landing() {
           A personal finance dashboard — accounts, budgets, reports, and recurring
           subscription detection.
         </p>
-        <p className="mt-8 text-sm text-slate-400">Frontend scaffold · Vite + React + Tailwind</p>
+        <div className="mt-8 flex items-center justify-center gap-3">
+          <Link
+            to="/register"
+            className="rounded-lg bg-emerald-600 px-5 py-2.5 font-medium text-white transition hover:bg-emerald-700"
+          >
+            Get started
+          </Link>
+          <Link
+            to="/login"
+            className="rounded-lg border border-slate-300 px-5 py-2.5 font-medium text-slate-700 transition hover:bg-slate-100"
+          >
+            Sign in
+          </Link>
+        </div>
       </div>
     </div>
   )
