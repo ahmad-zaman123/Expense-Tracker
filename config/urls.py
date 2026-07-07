@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.urls import include, path
-
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 urlpatterns = (
@@ -12,4 +11,5 @@ urlpatterns = (
         name="swagger-ui",
     ),
     path("api/", include("apps.users.urls")),
+    path("api/", include("apps.finance.urls")),
 )
