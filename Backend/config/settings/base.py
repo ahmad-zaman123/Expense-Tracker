@@ -27,6 +27,7 @@ DJANGO_APPS = (
 )
 
 THIRD_PARTY_APPS = (
+    "corsheaders",
     "rest_framework",
     "django_filters",
     "drf_spectacular",
@@ -44,6 +45,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 MIDDLEWARE = (
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -152,3 +154,10 @@ SPECTACULAR_SETTINGS = {
 
 # Shared secret for the Vercel Cron -> internal detect-recurring endpoint.
 CRON_SECRET = env("CRON_SECRET", default="insecure-cron-secret")
+
+
+# CORS — allow the frontend origin(s) to call the API from the browser.
+CORS_ALLOWED_ORIGINS = env.list(
+    "CORS_ALLOWED_ORIGINS",
+    default=["http://localhost:5173", "http://127.0.0.1:5173"],
+)

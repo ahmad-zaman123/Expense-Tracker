@@ -5,7 +5,9 @@
 #    pip-compile --strip-extras requirements/base.in
 #
 asgiref==3.11.1
-    # via django
+    # via
+    #   django
+    #   django-cors-headers
 attrs==26.1.0
     # via
     #   jsonschema
@@ -13,10 +15,13 @@ attrs==26.1.0
 django==4.2.30
     # via
     #   -r requirements/base.in
+    #   django-cors-headers
     #   django-filter
     #   djangorestframework
     #   djangorestframework-simplejwt
     #   drf-spectacular
+django-cors-headers==4.9.0
+    # via -r requirements/base.in
 django-environ==0.14.0
     # via -r requirements/base.in
 django-filter==25.1
