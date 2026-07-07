@@ -6,6 +6,8 @@ const NAV_ITEMS = [
   { to: "/app", label: "Dashboard", end: true },
   { to: "/app/accounts", label: "Accounts" },
   { to: "/app/transactions", label: "Transactions" },
+  { to: "/app/transfers", label: "Transfers" },
+  { to: "/app/budgets", label: "Budgets" },
 ]
 
 function navClass({ isActive }) {

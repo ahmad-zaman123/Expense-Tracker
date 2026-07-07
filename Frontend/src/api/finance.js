@@ -51,3 +51,41 @@ export function importTransactions({ accountId, file }) {
     isForm: true,
   })
 }
+
+// Transfers
+export function listTransfers() {
+  return apiRequest("/transfers/")
+}
+
+export function createTransfer({ fromAccountId, toAccountId, amount, occurredAt, description }) {
+  return apiRequest("/transfers/", {
+    method: "POST",
+    body: {
+      from_account_id: fromAccountId,
+      to_account_id: toAccountId,
+      amount,
+      occurred_at: occurredAt,
+      description: description || "",
+    },
+  })
+}
+
+export function deleteTransfer(id) {
+  return apiRequest("/transfers/" + id + "/", { method: "DELETE" })
+}
+
+// Budgets
+export function listBudgets() {
+  return apiRequest("/budgets/")
+}
+
+export function createBudget({ categoryId, amount }) {
+  return apiRequest("/budgets/", {
+    method: "POST",
+    body: { category_id: categoryId, amount },
+  })
+}
+
+export function deleteBudget(id) {
+  return apiRequest("/budgets/" + id + "/", { method: "DELETE" })
+}

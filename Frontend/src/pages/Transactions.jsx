@@ -9,15 +9,9 @@ import {
   listTransactions,
 } from "../api/finance"
 import { Alert, Button, Card, SelectField, TextField } from "../components/ui.jsx"
+import { todayISODate } from "../utils/date"
 import { formatError } from "../utils/errors"
 import { formatMoney } from "../utils/format"
-
-function todayISODate() {
-  const now = new Date()
-  const month = String(now.getMonth() + 1).padStart(2, "0")
-  const day = String(now.getDate()).padStart(2, "0")
-  return now.getFullYear() + "-" + month + "-" + day
-}
 
 function monthBounds(month) {
   if (!month) {
