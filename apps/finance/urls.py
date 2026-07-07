@@ -8,6 +8,7 @@ from apps.finance.views import (
     CategoryDetailAPIView,
     CategoryListCreateAPIView,
     TransactionDetailAPIView,
+    TransactionImportAPIView,
     TransactionListCreateAPIView,
     TransferDetailAPIView,
     TransferListCreateAPIView,
@@ -28,6 +29,11 @@ urlpatterns = (
         "transactions/",
         TransactionListCreateAPIView.as_view(),
         name="transaction-list",
+    ),
+    path(
+        "transactions/import/",
+        TransactionImportAPIView.as_view(),
+        name="transaction-import",
     ),
     path(
         "transactions/<uuid:pk>/",

@@ -1,4 +1,6 @@
-from rest_framework import generics
+from rest_framework import generics, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from apps.finance.filters import TransactionFilter
 from apps.finance.models import Account, Budget, Category, Transaction, Transfer
@@ -6,10 +8,12 @@ from apps.finance.serializers import (
     AccountSerializer,
     BudgetSerializer,
     CategorySerializer,
+    TransactionImportSerializer,
     TransactionSerializer,
     TransferSerializer,
 )
 from apps.finance.services.balances import with_current_balance
+from apps.finance.services.imports import import_transactions_from_csv
 
 
 class UserScopedMixin:
@@ -73,6 +77,23 @@ class TransactionDetailAPIView(UserScopedMixin, generics.RetrieveUpdateDestroyAP
         "account", "category"
     )
     serializer_class = TransactionSerializer
+
+
+class TransactionImportAPIView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = TransactionImportSerializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            summary = import_transactions_from_csv(
+                user=request.user,
+                account=serializer.validated_data["account"],
+                file_obj=serializer.validated_data["file"],
+            )
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(summary, status=status.HTTP_201_CREATED)
 
 
 class TransferListCreateAPIView(UserScopedMixin, generics.ListCreateAPIView):

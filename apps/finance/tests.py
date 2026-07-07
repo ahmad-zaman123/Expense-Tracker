@@ -2,12 +2,13 @@ from decimal import Decimal
 
 import pytest
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from apps.finance.choices import TransactionKind
+from apps.finance.choices import TransactionKind, TransactionSource
 from apps.finance.constants import DEFAULT_CATEGORIES
 from apps.finance.models import Account, Budget, Category, Transaction, Transfer
 
@@ -300,3 +301,85 @@ class TestTransfers:
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert Transaction.objects.filter(transfer=transfer).count() == 0
+
+
+CSV_CONTENT = (
+    b"date,description,amount,payee,kind\n"
+    b"2026-07-01,ATM Withdrawal,5000,,EXPENSE\n"
+    b"2026-07-02,Netflix,1100,Netflix,EXPENSE\n"
+    b"2026-07-05,Salary,50000,Employer,INCOME\n"
+)
+
+
+def _csv_upload(content=CSV_CONTENT, name="statement.csv"):
+    return SimpleUploadedFile(name, content, content_type="text/csv")
+
+
+class TestTransactionImport:
+    def test_import_creates_transactions(self, client, user):
+        account = Account.objects.create(user=user, name="Bank")
+
+        response = client.post(
+            reverse("transaction-import"),
+            {"account_id": str(account.pk), "file": _csv_upload()},
+            format="multipart",
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.data["created"] == 3
+        assert Transaction.objects.filter(user=user, source=TransactionSource.IMPORT).count() == 3
+
+    def test_reimport_is_idempotent(self, client, user):
+        account = Account.objects.create(user=user, name="Bank")
+        client.post(
+            reverse("transaction-import"),
+            {"account_id": str(account.pk), "file": _csv_upload()},
+            format="multipart",
+        )
+
+        response = client.post(
+            reverse("transaction-import"),
+            {"account_id": str(account.pk), "file": _csv_upload()},
+            format="multipart",
+        )
+
+        assert response.data["created"] == 0
+        assert response.data["skipped"] == 3
+        assert Transaction.objects.filter(user=user).count() == 3
+
+    def test_malformed_row_reported(self, client, user):
+        account = Account.objects.create(user=user, name="Bank")
+        content = b"date,description,amount\n" b"2026-07-01,Good,100\n" b"not-a-date,Bad,200\n"
+
+        response = client.post(
+            reverse("transaction-import"),
+            {"account_id": str(account.pk), "file": _csv_upload(content)},
+            format="multipart",
+        )
+
+        assert response.data["created"] == 1
+        assert len(response.data["errors"]) == 1
+        assert response.data["errors"][0]["row"] == 2
+
+    def test_missing_required_columns_returns_400(self, client, user):
+        account = Account.objects.create(user=user, name="Bank")
+        content = b"description,payee\nNetflix,Netflix\n"
+
+        response = client.post(
+            reverse("transaction-import"),
+            {"account_id": str(account.pk), "file": _csv_upload(content)},
+            format="multipart",
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_rejects_other_users_account(self, client, other_user):
+        account = Account.objects.create(user=other_user, name="Theirs")
+
+        response = client.post(
+            reverse("transaction-import"),
+            {"account_id": str(account.pk), "file": _csv_upload()},
+            format="multipart",
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST

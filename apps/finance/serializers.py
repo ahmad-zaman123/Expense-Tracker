@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from apps.finance.choices import TransactionKind
+from apps.finance.constants import MAX_IMPORT_FILE_SIZE
 from apps.finance.models import Account, Budget, Category, Transaction, Transfer
 from apps.finance.services.transfers import create_transfer
 
@@ -193,3 +194,24 @@ class TransferSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context["request"]
         return create_transfer(user=request.user, **validated_data)
+
+
+class TransactionImportSerializer(serializers.Serializer):
+    account_id = serializers.PrimaryKeyRelatedField(
+        source="account",
+        queryset=Account.objects.all(),
+    )
+    file = serializers.FileField()
+
+    def validate_account_id(self, account):
+        request = self.context["request"]
+        if account.user_id != request.user.id:
+            raise serializers.ValidationError("Account not found.")
+        return account
+
+    def validate_file(self, uploaded_file):
+        if uploaded_file.size > MAX_IMPORT_FILE_SIZE:
+            raise serializers.ValidationError("File too large (max 2 MB).")
+        if not uploaded_file.name.lower().endswith(".csv"):
+            raise serializers.ValidationError("Only .csv files are accepted.")
+        return uploaded_file
