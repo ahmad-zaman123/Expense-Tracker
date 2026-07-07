@@ -34,3 +34,11 @@ export function Alert({ children }) {
   }
   return <div className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{children}</div>
 }
+
+export function Card({ children, className = "" }) {
+  return (
+    <div className={"rounded-xl border border-slate-200 bg-white p-5 shadow-sm " + className}>
+      {children}
+    </div>
+  )
+}

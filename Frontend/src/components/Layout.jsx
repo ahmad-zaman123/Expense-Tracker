@@ -1,6 +1,18 @@
-import { Outlet, useNavigate } from "react-router-dom"
+import { NavLink, Outlet, useNavigate } from "react-router-dom"
 
 import { useAuth } from "../auth/AuthContext"
+
+const NAV_ITEMS = [
+  { to: "/app", label: "Dashboard", end: true },
+  { to: "/app/accounts", label: "Accounts" },
+]
+
+function navClass({ isActive }) {
+  return (
+    "rounded-md px-3 py-2 text-sm font-medium " +
+    (isActive ? "bg-emerald-50 text-emerald-700" : "text-slate-600 hover:text-slate-900")
+  )
+}
 
 function Layout() {
   const { user, signOut } = useAuth()
@@ -31,6 +43,13 @@ function Layout() {
             </button>
           </div>
         </div>
+        <nav className="mx-auto flex max-w-5xl gap-1 px-3 pb-2">
+          {NAV_ITEMS.map((item) => (
+            <NavLink key={item.to} to={item.to} end={item.end} className={navClass}>
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
       </header>
       <main className="mx-auto max-w-5xl px-4 py-8">
         <Outlet />

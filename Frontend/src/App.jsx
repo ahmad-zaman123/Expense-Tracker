@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom"
 
 import Layout from "./components/Layout.jsx"
 import ProtectedRoute from "./components/ProtectedRoute.jsx"
+import Accounts from "./pages/Accounts.jsx"
 import Dashboard from "./pages/Dashboard.jsx"
 import Landing from "./pages/Landing.jsx"
 import Login from "./pages/Login.jsx"
@@ -22,6 +23,7 @@ function App() {
         }
       >
         <Route index element={<Dashboard />} />
+        <Route path="accounts" element={<Accounts />} />
       </Route>
     </Routes>
   )
