@@ -9,9 +9,7 @@ Single currency (PKR). JWT authentication. Deployable to Vercel (serverless) wit
 a Neon Postgres database; recurring detection runs as a nightly Vercel Cron job —
 no always-on worker required.
 
-![CI](https://github.com/OWNER/expense-tracker/actions/workflows/ci.yml/badge.svg)
-
-> Replace `OWNER` in the badge URL after pushing to GitHub.
+![CI](https://github.com/ahmad-zaman123/expense-tracker-api/actions/workflows/ci.yml/badge.svg)
 
 ## Why this project
 
