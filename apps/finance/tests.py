@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 import pytest
@@ -10,7 +11,15 @@ from rest_framework.test import APIClient
 
 from apps.finance.choices import TransactionKind, TransactionSource
 from apps.finance.constants import DEFAULT_CATEGORIES
-from apps.finance.models import Account, Budget, Category, Transaction, Transfer
+from apps.finance.models import (
+    Account,
+    Budget,
+    Category,
+    RecurringRule,
+    Transaction,
+    Transfer,
+)
+from apps.finance.services.recurring import detect_recurring_for_user
 
 User = get_user_model()
 
@@ -383,3 +392,54 @@ class TestTransactionImport:
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+class TestRecurringDetection:
+    def _monthly_payee(self, user, account, payee, months=3, amount="1100.00"):
+        base = timezone.make_aware(datetime(2026, 5, 2, 12, 0))
+        for offset in range(months):
+            Transaction.objects.create(
+                user=user,
+                account=account,
+                payee=payee,
+                kind=TransactionKind.EXPENSE,
+                amount=Decimal(amount),
+                occurred_at=base + timedelta(days=30 * offset),
+            )
+
+    def test_detects_monthly_subscription(self, user):
+        account = Account.objects.create(user=user, name="Bank")
+        self._monthly_payee(user, account, "Netflix")
+
+        upserted = detect_recurring_for_user(user)
+
+        assert upserted == 1
+        rule = RecurringRule.objects.get(user=user, payee="Netflix")
+        assert rule.sample_count == 3
+        assert 25 <= rule.cadence_days <= 35
+        assert rule.avg_amount == Decimal("1100.00")
+
+    def test_ignores_one_off_transaction(self, user):
+        account = Account.objects.create(user=user, name="Bank")
+        Transaction.objects.create(
+            user=user,
+            account=account,
+            payee="OneTime",
+            kind=TransactionKind.EXPENSE,
+            amount=Decimal("500.00"),
+            occurred_at=timezone.now(),
+        )
+
+        upserted = detect_recurring_for_user(user)
+
+        assert upserted == 0
+        assert not RecurringRule.objects.filter(user=user).exists()
+
+    def test_is_idempotent(self, user):
+        account = Account.objects.create(user=user, name="Bank")
+        self._monthly_payee(user, account, "Netflix")
+
+        detect_recurring_for_user(user)
+        detect_recurring_for_user(user)
+
+        assert RecurringRule.objects.filter(user=user, payee="Netflix").count() == 1

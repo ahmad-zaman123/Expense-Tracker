@@ -191,3 +191,48 @@ class Budget(BaseModel):
 
     def __str__(self):
         return "%s budget" % self.category
+
+
+class RecurringRule(BaseModel):
+    payee = models.CharField(max_length=255)
+    kind = models.CharField(max_length=15, choices=TransactionKind.choices)
+    avg_amount = models.DecimalField(max_digits=12, decimal_places=2)
+    cadence_days = models.PositiveIntegerField()
+    next_expected_at = models.DateField()
+    confidence = models.DecimalField(max_digits=3, decimal_places=2)
+    last_matched_at = models.DateField()
+    sample_count = models.PositiveIntegerField()
+    is_dismissed = models.BooleanField(default=False)
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="recurring_rules",
+    )
+    account = models.ForeignKey(
+        "finance.Account",
+        on_delete=models.CASCADE,
+        related_name="recurring_rules",
+    )
+    category = models.ForeignKey(
+        "finance.Category",
+        on_delete=models.SET_NULL,
+        related_name="recurring_rules",
+        null=True,
+        blank=True,
+    )
+
+    class Meta:
+        verbose_name = "Recurring rule"
+        verbose_name_plural = "Recurring rules"
+        db_table = "recurring_rules"
+        ordering = ("next_expected_at",)
+        constraints = (
+            models.UniqueConstraint(
+                fields=("user", "account", "payee", "kind"),
+                name="uniq_recurring_per_user_account_payee_kind",
+            ),
+        )
+
+    def __str__(self):
+        return "%s every %s days" % (self.payee, self.cadence_days)

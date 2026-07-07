@@ -1,6 +1,13 @@
 from django.contrib import admin
 
-from apps.finance.models import Account, Budget, Category, Transaction, Transfer
+from apps.finance.models import (
+    Account,
+    Budget,
+    Category,
+    RecurringRule,
+    Transaction,
+    Transfer,
+)
 
 
 @admin.register(Account)
@@ -42,3 +49,20 @@ class BudgetAdmin(admin.ModelAdmin):
     list_filter = ("is_active",)
     search_fields = ("category__name", "user__email")
     raw_id_fields = ("user", "category")
+
+
+@admin.register(RecurringRule)
+class RecurringRuleAdmin(admin.ModelAdmin):
+    list_display = (
+        "payee",
+        "kind",
+        "avg_amount",
+        "cadence_days",
+        "next_expected_at",
+        "confidence",
+        "is_dismissed",
+        "user",
+    )
+    list_filter = ("kind", "is_dismissed")
+    search_fields = ("payee", "user__email")
+    raw_id_fields = ("user", "account", "category")
