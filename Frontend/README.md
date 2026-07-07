@@ -1,16 +1,37 @@
-# React + Vite
+# Expense Tracker — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A Vite + React + Tailwind dashboard for the Expense Tracker API. See the
+[root README](../README.md) for the full project and the backend.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+React 19 · Vite · React Router · Tailwind CSS v4 · Recharts
 
-## React Compiler
+## Local development
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm install
+cp .env.example .env      # set VITE_API_URL (e.g. http://127.0.0.1:8000/api)
+npm run dev               # http://localhost:5173
+npm run build             # production build to dist/
+```
 
-## Expanding the Oxlint configuration
+The backend must be running and reachable at `VITE_API_URL`, and its
+`CORS_ALLOWED_ORIGINS` must include this app's origin (`http://localhost:5173` by
+default in dev).
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## Structure
+
+```
+src/api/         fetch client (JWT header) + endpoint wrappers
+src/auth/        JWT auth context (login/register/logout, persisted token)
+src/components/  Layout, ProtectedRoute, shared UI (ui.jsx), CashflowChart
+src/pages/       Landing, Login, Register, Dashboard, Accounts, Transactions,
+                 Transfers, Budgets, Recurring
+src/utils/       date, money, and error-formatting helpers
+```
+
+## Deployment
+
+Deploys as its own Vercel project (Root Directory `Frontend`) with `VITE_API_URL`
+pointing at the backend. See [DEPLOY.md](../DEPLOY.md).
