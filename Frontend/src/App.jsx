@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard.jsx"
 import Landing from "./pages/Landing.jsx"
 import Login from "./pages/Login.jsx"
 import Register from "./pages/Register.jsx"
+import Transactions from "./pages/Transactions.jsx"
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
       >
         <Route index element={<Dashboard />} />
         <Route path="accounts" element={<Accounts />} />
+        <Route path="transactions" element={<Transactions />} />
       </Route>
     </Routes>
   )

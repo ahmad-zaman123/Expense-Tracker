@@ -13,6 +13,22 @@ export function TextField({ label, type = "text", value, onChange, ...props }) {
   )
 }
 
+export function SelectField({ label, value, onChange, children, ...props }) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-sm font-medium text-slate-700">{label}</span>
+      <select
+        value={value}
+        onChange={onChange}
+        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
+        {...props}
+      >
+        {children}
+      </select>
+    </label>
+  )
+}
+
 export function Button({ children, className = "", ...props }) {
   return (
     <button

@@ -5,6 +5,7 @@ import { useAuth } from "../auth/AuthContext"
 const NAV_ITEMS = [
   { to: "/app", label: "Dashboard", end: true },
   { to: "/app/accounts", label: "Accounts" },
+  { to: "/app/transactions", label: "Transactions" },
 ]
 
 function navClass({ isActive }) {
