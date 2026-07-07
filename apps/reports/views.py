@@ -1,6 +1,8 @@
 from datetime import datetime
 
 from django.utils import timezone
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -14,6 +16,16 @@ from apps.reports.services import budget_status, cashflow, monthly_report
 
 
 class MonthlyReportAPIView(APIView):
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "month",
+                OpenApiTypes.STR,
+                description="Target month as YYYY-MM. Defaults to the current month.",
+            ),
+        ],
+        responses=MonthlyReportSerializer,
+    )
     def get(self, request, *args, **kwargs):
         month_param = request.query_params.get("month")
         if month_param:
@@ -34,12 +46,25 @@ class MonthlyReportAPIView(APIView):
 
 
 class BudgetStatusAPIView(APIView):
+    @extend_schema(responses=BudgetStatusSerializer(many=True))
     def get(self, request, *args, **kwargs):
         data = budget_status(request.user)
         return Response(BudgetStatusSerializer(data, many=True).data)
 
 
 class CashflowAPIView(APIView):
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("from", OpenApiTypes.DATE, description="Start date, YYYY-MM-DD."),
+            OpenApiParameter("to", OpenApiTypes.DATE, description="End date, YYYY-MM-DD."),
+            OpenApiParameter(
+                "granularity",
+                OpenApiTypes.STR,
+                description="Bucket size: 'month' (default) or 'day'.",
+            ),
+        ],
+        responses=CashflowBucketSerializer(many=True),
+    )
     def get(self, request, *args, **kwargs):
         from_param = request.query_params.get("from")
         to_param = request.query_params.get("to")

@@ -1,3 +1,5 @@
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from apps.finance.choices import TransactionKind
@@ -28,6 +30,7 @@ class AccountSerializer(serializers.ModelSerializer):
         )
         read_only_fields = ("id", "created")
 
+    @extend_schema_field(OpenApiTypes.DECIMAL)
     def get_current_balance(self, account):
         # Present on list/detail via annotation; falls back to opening balance
         # on create, where the fresh instance carries no transactions yet.

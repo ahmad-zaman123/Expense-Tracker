@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.utils.crypto import constant_time_compare
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -42,6 +44,8 @@ class AccountListCreateAPIView(UserScopedMixin, generics.ListCreateAPIView):
     serializer_class = AccountSerializer
 
     def get_queryset(self, *args, **kwargs):
+        if getattr(self, "swagger_fake_view", False):
+            return Account.objects.none()
         return with_current_balance(Account.objects.filter(user=self.request.user))
 
 
@@ -49,6 +53,8 @@ class AccountDetailAPIView(UserScopedMixin, generics.RetrieveUpdateDestroyAPIVie
     serializer_class = AccountSerializer
 
     def get_queryset(self, *args, **kwargs):
+        if getattr(self, "swagger_fake_view", False):
+            return Account.objects.none()
         return with_current_balance(Account.objects.filter(user=self.request.user))
 
 
@@ -92,6 +98,10 @@ class TransactionDetailAPIView(UserScopedMixin, generics.RetrieveUpdateDestroyAP
 
 
 class TransactionImportAPIView(APIView):
+    @extend_schema(
+        request=TransactionImportSerializer,
+        responses={201: OpenApiTypes.OBJECT},
+    )
     def post(self, request, *args, **kwargs):
         serializer = TransactionImportSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
@@ -126,12 +136,15 @@ class RecurringRuleListAPIView(generics.ListAPIView):
     serializer_class = RecurringRuleSerializer
 
     def get_queryset(self, *args, **kwargs):
+        if getattr(self, "swagger_fake_view", False):
+            return RecurringRule.objects.none()
         return RecurringRule.objects.filter(
             user=self.request.user, is_dismissed=False
         ).select_related("account", "category")
 
 
 class RecurringRuleDismissAPIView(APIView):
+    @extend_schema(request=None, responses=RecurringRuleSerializer)
     def post(self, request, pk, *args, **kwargs):
         rule = RecurringRule.objects.filter(user=request.user, pk=pk).first()
         if rule is None:
@@ -149,6 +162,7 @@ class DetectRecurringInternalAPIView(APIView):
     authentication_classes = ()
     permission_classes = (AllowAny,)
 
+    @extend_schema(exclude=True)
     def get(self, request, *args, **kwargs):
         provided = request.headers.get("Authorization", "")
         expected = "Bearer %s" % settings.CRON_SECRET
