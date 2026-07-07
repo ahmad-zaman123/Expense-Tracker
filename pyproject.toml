@@ -6,3 +6,16 @@ target-version = ["py311"]
 profile = "black"
 line_length = 100
 known_first_party = ["apps", "config"]
+
+[tool.coverage.run]
+source = ["apps"]
+omit = [
+    "*/migrations/*",
+    "*/tests.py",
+    "*/apps.py",
+    "manage.py",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
