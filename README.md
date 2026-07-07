@@ -173,5 +173,10 @@ Postgres service on every push and pull request.
 
 ## Deployment
 
-See [DEPLOY.md](DEPLOY.md) for the full Vercel + Neon guide (two Vercel projects — one
-per folder — plus the nightly cron setup).
+Deploys to Vercel as two projects from this repo — Root Directory `Backend` (Django
+serverless, backed by a Neon Postgres database) and Root Directory `Frontend` (static
+React build with `VITE_API_URL` pointed at the backend). The backend's `vercel.json`
+runs recurring detection nightly via Vercel Cron. Backend env vars:
+`DJANGO_SETTINGS_MODULE=config.settings.prod`, `SECRET_KEY`, `DATABASE_URL`,
+`ALLOWED_HOSTS`, `CRON_SECRET`, `CORS_ALLOWED_ORIGINS` (see
+`Backend/.env.production.example`).

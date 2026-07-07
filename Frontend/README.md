@@ -34,4 +34,4 @@ src/utils/       date, money, and error-formatting helpers
 ## Deployment
 
 Deploys as its own Vercel project (Root Directory `Frontend`) with `VITE_API_URL`
-pointing at the backend. See [DEPLOY.md](../DEPLOY.md).
+pointing at the backend. See the [root README](../README.md#deployment).
