@@ -1,5 +1,8 @@
+from datetime import datetime
 from decimal import Decimal
+from zoneinfo import ZoneInfo
 
+from django.conf import settings
 from django.db.models import DecimalField, Q, Sum, Value
 from django.db.models.functions import Coalesce, TruncDay, TruncMonth
 from django.utils import timezone
@@ -9,6 +12,20 @@ from apps.finance.models import Budget, Transaction
 
 MONEY_FIELD = DecimalField(max_digits=14, decimal_places=2)
 ZERO = Value(Decimal("0.00"), output_field=MONEY_FIELD)
+
+# All reporting buckets align to the user's wall-clock timezone, not UTC, so a
+# transaction just after midnight local time lands in the correct month.
+REPORT_TZ = ZoneInfo(settings.TIME_ZONE)
+
+
+def _month_bounds(year, month):
+    """Return [start, end) as timezone-aware datetimes at REPORT_TZ midnight."""
+    start = datetime(year, month, 1, tzinfo=REPORT_TZ)
+    if month == 12:
+        end = datetime(year + 1, 1, 1, tzinfo=REPORT_TZ)
+    else:
+        end = datetime(year, month + 1, 1, tzinfo=REPORT_TZ)
+    return start, end
 
 
 def _income_sum():
@@ -25,11 +42,12 @@ def monthly_report(user, year, month):
     Transfer legs are excluded so moving money between accounts never shows up
     as spending or earning.
     """
+    start, end = _month_bounds(year, month)
     queryset = Transaction.objects.filter(
         user=user,
         transfer__isnull=True,
-        occurred_at__year=year,
-        occurred_at__month=month,
+        occurred_at__gte=start,
+        occurred_at__lt=end,
     )
 
     totals = queryset.aggregate(income=_income_sum(), expense=_expense_sum())
@@ -69,6 +87,7 @@ def budget_status(user):
         return []
 
     now = timezone.localtime()
+    start, end = _month_bounds(now.year, now.month)
     category_ids = [budget.category_id for budget in budgets]
     spent_rows = (
         Transaction.objects.filter(
@@ -76,8 +95,8 @@ def budget_status(user):
             transfer__isnull=True,
             kind=TransactionKind.EXPENSE,
             category_id__in=category_ids,
-            occurred_at__year=now.year,
-            occurred_at__month=now.month,
+            occurred_at__gte=start,
+            occurred_at__lt=end,
         )
         .values("category_id")
         .annotate(total=Coalesce(Sum("amount"), ZERO))
@@ -105,7 +124,11 @@ def budget_status(user):
 
 def cashflow(user, date_from, date_to, granularity="month"):
     """Net income - expense per time bucket over a date range (for charting)."""
-    trunc = TruncMonth("occurred_at") if granularity == "month" else TruncDay("occurred_at")
+    trunc = (
+        TruncMonth("occurred_at", tzinfo=REPORT_TZ)
+        if granularity == "month"
+        else TruncDay("occurred_at", tzinfo=REPORT_TZ)
+    )
 
     rows = (
         Transaction.objects.filter(

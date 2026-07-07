@@ -1,5 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
+from zoneinfo import ZoneInfo
 
 import pytest
 from django.contrib.auth import get_user_model
@@ -179,3 +180,26 @@ class TestCashflow:
         response = client.get(reverse("report-cashflow"))
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+class TestTimezoneBuckets:
+    def test_after_local_midnight_counts_in_local_month(self, client, user):
+        # 2026-08-01 02:00 in Karachi == 2026-07-31 21:00 UTC. Bucketing by UTC
+        # would wrongly place this in July; it must land in August (local month).
+        bank = Account.objects.create(user=user, name="Bank")
+        salary = Category.objects.get(user=user, name="Salary")
+        occurred = datetime(2026, 8, 1, 2, 0, tzinfo=ZoneInfo("Asia/Karachi"))
+        Transaction.objects.create(
+            user=user,
+            account=bank,
+            category=salary,
+            kind=TransactionKind.INCOME,
+            amount=Decimal("1000.00"),
+            occurred_at=occurred,
+        )
+
+        july = client.get(reverse("report-monthly"), {"month": "2026-07"})
+        august = client.get(reverse("report-monthly"), {"month": "2026-08"})
+
+        assert Decimal(july.data["income"]) == Decimal("0.00")
+        assert Decimal(august.data["income"]) == Decimal("1000.00")
