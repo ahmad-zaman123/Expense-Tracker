@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 
 import pytest
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
@@ -443,3 +444,83 @@ class TestRecurringDetection:
         detect_recurring_for_user(user)
 
         assert RecurringRule.objects.filter(user=user, payee="Netflix").count() == 1
+
+
+def _make_rule(user, account, payee="Netflix", dismissed=False):
+    return RecurringRule.objects.create(
+        user=user,
+        account=account,
+        payee=payee,
+        kind=TransactionKind.EXPENSE,
+        avg_amount=Decimal("1100.00"),
+        cadence_days=30,
+        next_expected_at=datetime(2026, 8, 2).date(),
+        confidence=Decimal("0.90"),
+        last_matched_at=datetime(2026, 7, 2).date(),
+        sample_count=3,
+        is_dismissed=dismissed,
+    )
+
+
+class TestRecurringEndpoints:
+    def test_list_excludes_dismissed(self, client, user):
+        account = Account.objects.create(user=user, name="Bank")
+        _make_rule(user, account, "Netflix")
+        _make_rule(user, account, "Spotify", dismissed=True)
+
+        response = client.get(reverse("recurring-list"))
+
+        payees = [row["payee"] for row in response.data["results"]]
+        assert payees == ["Netflix"]
+
+    def test_list_is_user_scoped(self, client, user, other_user):
+        account = Account.objects.create(user=other_user, name="Theirs")
+        _make_rule(other_user, account, "Netflix")
+
+        response = client.get(reverse("recurring-list"))
+
+        assert response.data["count"] == 0
+
+    def test_dismiss(self, client, user):
+        account = Account.objects.create(user=user, name="Bank")
+        rule = _make_rule(user, account, "Netflix")
+
+        response = client.post(reverse("recurring-dismiss", args=[rule.pk]))
+
+        assert response.status_code == status.HTTP_200_OK
+        rule.refresh_from_db()
+        assert rule.is_dismissed is True
+
+    def test_cannot_dismiss_others_rule(self, client, other_user):
+        account = Account.objects.create(user=other_user, name="Theirs")
+        rule = _make_rule(other_user, account, "Netflix")
+
+        response = client.post(reverse("recurring-dismiss", args=[rule.pk]))
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        rule.refresh_from_db()
+        assert rule.is_dismissed is False
+
+
+class TestDetectRecurringInternal:
+    def test_runs_with_valid_secret(self, db):
+        response = APIClient().get(
+            reverse("detect-recurring-internal"),
+            HTTP_AUTHORIZATION="Bearer %s" % settings.CRON_SECRET,
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "upserted" in response.data
+
+    def test_rejects_missing_secret(self, db):
+        response = APIClient().get(reverse("detect-recurring-internal"))
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_rejects_wrong_secret(self, db):
+        response = APIClient().get(
+            reverse("detect-recurring-internal"),
+            HTTP_AUTHORIZATION="Bearer wrong-secret",
+        )
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED

@@ -2,7 +2,14 @@ from rest_framework import serializers
 
 from apps.finance.choices import TransactionKind
 from apps.finance.constants import MAX_IMPORT_FILE_SIZE
-from apps.finance.models import Account, Budget, Category, Transaction, Transfer
+from apps.finance.models import (
+    Account,
+    Budget,
+    Category,
+    RecurringRule,
+    Transaction,
+    Transfer,
+)
 from apps.finance.services.transfers import create_transfer
 
 
@@ -215,3 +222,27 @@ class TransactionImportSerializer(serializers.Serializer):
         if not uploaded_file.name.lower().endswith(".csv"):
             raise serializers.ValidationError("Only .csv files are accepted.")
         return uploaded_file
+
+
+class RecurringRuleSerializer(serializers.ModelSerializer):
+    account = AccountSerializer(read_only=True)
+    category = CategorySerializer(read_only=True)
+
+    class Meta:
+        model = RecurringRule
+        fields = (
+            "id",
+            "payee",
+            "kind",
+            "avg_amount",
+            "cadence_days",
+            "next_expected_at",
+            "confidence",
+            "last_matched_at",
+            "sample_count",
+            "is_dismissed",
+            "account",
+            "category",
+            "created",
+        )
+        read_only_fields = fields

@@ -1,19 +1,31 @@
+from django.conf import settings
+from django.utils.crypto import constant_time_compare
 from rest_framework import generics, status
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.finance.filters import TransactionFilter
-from apps.finance.models import Account, Budget, Category, Transaction, Transfer
+from apps.finance.models import (
+    Account,
+    Budget,
+    Category,
+    RecurringRule,
+    Transaction,
+    Transfer,
+)
 from apps.finance.serializers import (
     AccountSerializer,
     BudgetSerializer,
     CategorySerializer,
+    RecurringRuleSerializer,
     TransactionImportSerializer,
     TransactionSerializer,
     TransferSerializer,
 )
 from apps.finance.services.balances import with_current_balance
 from apps.finance.services.imports import import_transactions_from_csv
+from apps.finance.services.recurring import detect_recurring_all_users
 
 
 class UserScopedMixin:
@@ -108,3 +120,43 @@ class TransferListCreateAPIView(UserScopedMixin, generics.ListCreateAPIView):
 class TransferDetailAPIView(UserScopedMixin, generics.RetrieveDestroyAPIView):
     queryset = Transfer.objects.select_related("from_account", "to_account").all()
     serializer_class = TransferSerializer
+
+
+class RecurringRuleListAPIView(generics.ListAPIView):
+    serializer_class = RecurringRuleSerializer
+
+    def get_queryset(self, *args, **kwargs):
+        return RecurringRule.objects.filter(
+            user=self.request.user, is_dismissed=False
+        ).select_related("account", "category")
+
+
+class RecurringRuleDismissAPIView(APIView):
+    def post(self, request, pk, *args, **kwargs):
+        rule = RecurringRule.objects.filter(user=request.user, pk=pk).first()
+        if rule is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        rule.is_dismissed = True
+        rule.save(update_fields=("is_dismissed", "modified"))
+        return Response(RecurringRuleSerializer(rule).data)
+
+
+class DetectRecurringInternalAPIView(APIView):
+    """Cron-only endpoint. Vercel Cron issues a GET with an
+    Authorization: Bearer <CRON_SECRET> header; no user session is involved."""
+
+    authentication_classes = ()
+    permission_classes = (AllowAny,)
+
+    def get(self, request, *args, **kwargs):
+        provided = request.headers.get("Authorization", "")
+        expected = "Bearer %s" % settings.CRON_SECRET
+        if not constant_time_compare(provided, expected):
+            return Response(
+                {"detail": "Invalid cron secret."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        count = detect_recurring_all_users()
+        return Response({"upserted": count})

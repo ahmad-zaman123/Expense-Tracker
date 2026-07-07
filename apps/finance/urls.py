@@ -7,6 +7,9 @@ from apps.finance.views import (
     BudgetListCreateAPIView,
     CategoryDetailAPIView,
     CategoryListCreateAPIView,
+    DetectRecurringInternalAPIView,
+    RecurringRuleDismissAPIView,
+    RecurringRuleListAPIView,
     TransactionDetailAPIView,
     TransactionImportAPIView,
     TransactionListCreateAPIView,
@@ -45,5 +48,16 @@ urlpatterns = (
         "transfers/<uuid:pk>/",
         TransferDetailAPIView.as_view(),
         name="transfer-detail",
+    ),
+    path("recurring/", RecurringRuleListAPIView.as_view(), name="recurring-list"),
+    path(
+        "recurring/<uuid:pk>/dismiss/",
+        RecurringRuleDismissAPIView.as_view(),
+        name="recurring-dismiss",
+    ),
+    path(
+        "internal/detect-recurring/",
+        DetectRecurringInternalAPIView.as_view(),
+        name="detect-recurring-internal",
     ),
 )
