@@ -51,6 +51,17 @@ regularity. Idempotent via `update_or_create`. Runs as a management command and 
 secret-gated cron endpoint.
 See `apps/finance/services/recurring.py`.
 
+## Repository layout
+
+This is a monorepo with two halves:
+
+```
+Backend/     Django REST API (this README covers it; paths below are relative to Backend/)
+Frontend/    Vite + React dashboard that consumes the API (work in progress)
+```
+
+Each deploys as its own Vercel project (different Root Directory).
+
 ## Tech stack
 
 - Python 3.11 · Django 4.2 · Django REST Framework
@@ -123,6 +134,7 @@ date,description,amount,payee,kind
 ## Local setup
 
 ```bash
+cd Backend
 python -m venv .venv
 source .venv/bin/activate
 pip install pip-tools
