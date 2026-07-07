@@ -9,6 +9,7 @@ from apps.finance.serializers import (
     TransactionSerializer,
     TransferSerializer,
 )
+from apps.finance.services.balances import with_current_balance
 
 
 class UserScopedMixin:
@@ -22,13 +23,17 @@ class UserScopedMixin:
 
 
 class AccountListCreateAPIView(UserScopedMixin, generics.ListCreateAPIView):
-    queryset = Account.objects.all()
     serializer_class = AccountSerializer
+
+    def get_queryset(self, *args, **kwargs):
+        return with_current_balance(Account.objects.filter(user=self.request.user))
 
 
 class AccountDetailAPIView(UserScopedMixin, generics.RetrieveUpdateDestroyAPIView):
-    queryset = Account.objects.all()
     serializer_class = AccountSerializer
+
+    def get_queryset(self, *args, **kwargs):
+        return with_current_balance(Account.objects.filter(user=self.request.user))
 
 
 class CategoryListCreateAPIView(UserScopedMixin, generics.ListCreateAPIView):

@@ -6,10 +6,27 @@ from apps.finance.services.transfers import create_transfer
 
 
 class AccountSerializer(serializers.ModelSerializer):
+    current_balance = serializers.SerializerMethodField()
+
     class Meta:
         model = Account
-        fields = ("id", "name", "opening_balance", "is_archived", "created")
+        fields = (
+            "id",
+            "name",
+            "opening_balance",
+            "current_balance",
+            "is_archived",
+            "created",
+        )
         read_only_fields = ("id", "created")
+
+    def get_current_balance(self, account):
+        # Present on list/detail via annotation; falls back to opening balance
+        # on create, where the fresh instance carries no transactions yet.
+        balance = getattr(account, "current_balance", None)
+        if balance is None:
+            balance = account.opening_balance
+        return "%.2f" % balance
 
 
 class CategorySerializer(serializers.ModelSerializer):
