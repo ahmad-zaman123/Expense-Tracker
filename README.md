@@ -1,5 +1,9 @@
 # Expense Tracker
 
+[![CI](https://github.com/ahmad-zaman123/Expense-Tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/ahmad-zaman123/Expense-Tracker/actions/workflows/ci.yml)
+
+**🔗 Live demo: [expense-tracker-three-vert-61.vercel.app](https://expense-tracker-three-vert-61.vercel.app)**
+
 A full-stack personal finance app: track income and expenses across accounts,
 move money between them, set per-category budgets, view monthly reports and
 cashflow charts, import bank statements, and auto-detect recurring subscriptions.
@@ -8,8 +12,6 @@ A **Django REST** backend (`Backend/`) and a **React + Tailwind** dashboard
 (`Frontend/`) in one repo. Single currency (PKR). JWT authentication. Both halves
 deploy to Vercel; the backend uses a Neon Postgres database and runs recurring
 detection as a nightly Vercel Cron job — no always-on worker required.
-
-![CI](https://github.com/ahmad-zaman123/expense-tracker/actions/workflows/ci.yml/badge.svg)
 
 ## Screenshots
 
