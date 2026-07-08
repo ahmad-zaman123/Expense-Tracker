@@ -1,3 +1,26 @@
+[project]
+name = "expense-tracker"
+version = "0.1.0"
+description = "Personal finance and expense tracking API."
+requires-python = ">=3.11"
+dependencies = [
+    "Django>=4.2,<4.3",
+    "djangorestframework",
+    "djangorestframework-simplejwt",
+    "django-cors-headers",
+    "django-environ",
+    "django-filter",
+    "drf-spectacular",
+    "psycopg[binary]",
+    "whitenoise",
+]
+
+# The app is not itself an installable package ? uv only manages its
+# dependencies. This keeps the Vercel uv builder from trying to build the
+# project and lets it install straight from the pinned dependency set.
+[tool.uv]
+package = false
+
 [tool.black]
 line-length = 100
 target-version = ["py311"]
