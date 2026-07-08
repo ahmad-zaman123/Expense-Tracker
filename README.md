@@ -75,29 +75,10 @@ endpoint. See `apps/finance/services/recurring.py`.
 
 **Deploy:** Vercel (serverless Python + static React) · Neon Postgres · Vercel Cron
 
-## Repository layout
+## API
 
-```
-Backend/     Django REST API
-  config/          settings split (base/dev/prod/test), urls, wsgi/asgi
-  apps/core        BaseModel (UUID pk + timestamps), pagination
-  apps/users       email-based custom User + JWT auth
-  apps/finance     Account, Category, Transaction, Transfer, Budget, RecurringRule
-                   services/ (balances, transfers, imports, recurring)
-  apps/reports     aggregation services + report endpoints
-  api/index.py     Vercel WSGI entrypoint
-
-Frontend/    Vite + React dashboard
-  src/api/         fetch client + endpoint wrappers
-  src/auth/        JWT auth context
-  src/components/  Layout, ProtectedRoute, shared UI, chart
-  src/pages/       Dashboard, Accounts, Transactions, Transfers, Budgets, Recurring
-```
-
-Backend business logic lives in `services/`; views stay thin and every list/detail
-endpoint is scoped to the authenticated user via `UserScopedMixin`. Transfers are two
-linked transaction "legs" (out=EXPENSE, in=INCOME) that count toward balances but are
-excluded from income/expense reports.
+Interactive Swagger docs at `/api/docs/` —
+[live](https://expense-tracker-beta-lake.vercel.app/api/docs/). JSON schema at `/api/schema/`.
 
 ## Local setup
 
@@ -126,59 +107,3 @@ npm install
 cp .env.example .env          # set VITE_API_URL (e.g. http://127.0.0.1:8000/api)
 npm run dev                   # http://localhost:5173
 ```
-
-Register from the UI, then use the dashboard. Run recurring detection manually with
-`make detect-recurring` (from `Backend/`).
-
-## API
-
-Interactive docs at `GET /api/docs/` (Swagger) · schema at `GET /api/schema/`.
-
-| Method | Path | Description |
-|---|---|---|
-| POST | `/api/auth/register/` | Register |
-| POST | `/api/auth/token/` · `/refresh/` | Obtain / refresh JWT |
-| GET | `/api/auth/me/` | Current user |
-| GET/POST · detail | `/api/accounts/` | Accounts (list has `current_balance`) |
-| GET/POST · detail | `/api/categories/` | Categories |
-| GET/POST · detail | `/api/budgets/` | Budgets |
-| GET/POST · detail | `/api/transactions/` | Transactions (filter/search) |
-| POST | `/api/transactions/import/` | CSV statement import (multipart) |
-| GET/POST · detail | `/api/transfers/` | Transfers |
-| GET | `/api/recurring/` · `POST /{id}/dismiss/` | Recurring rules |
-| GET | `/api/reports/monthly/?month=YYYY-MM` | Monthly income/expense + breakdown |
-| GET | `/api/reports/budget-status/` | Budget spent/remaining this month |
-| GET | `/api/reports/cashflow/?from=&to=&granularity=` | Net cashflow per bucket |
-
-### CSV import format
-
-```csv
-date,description,amount,payee,kind
-2026-07-01,ATM Withdrawal,5000,,EXPENSE
-2026-07-02,Netflix,1100,Netflix,EXPENSE
-2026-07-05,Salary,50000,Employer,INCOME
-```
-
-`date` is `YYYY-MM-DD`; `amount` positive; `payee` optional; `kind` defaults to
-`EXPENSE`. `account_id` is sent as a form field alongside the file.
-
-## Testing
-
-```bash
-cd Backend
-pytest              # full suite (PostgreSQL required)
-pytest --cov=apps   # with coverage
-```
-
-CI (GitHub Actions) runs black/isort/flake8 and the test suite with coverage against a
-Postgres service on every push and pull request.
-
-## Deployment
-
-Deploys to Vercel as two projects from this repo — Root Directory `Backend` (Django
-serverless, backed by a Neon Postgres database) and Root Directory `Frontend` (static
-React build with `VITE_API_URL` pointed at the backend). The backend's `vercel.json`
-runs recurring detection nightly via Vercel Cron. Backend env vars:
-`DJANGO_SETTINGS_MODULE=config.settings.prod`, `SECRET_KEY`, `DATABASE_URL`,
-`ALLOWED_HOSTS`, `CRON_SECRET`, `CORS_ALLOWED_ORIGINS` (see
-`Backend/.env.production.example`).
