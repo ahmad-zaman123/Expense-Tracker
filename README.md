@@ -4,6 +4,11 @@
 
 **🔗 Live demo: [expense-tracker-three-vert-61.vercel.app](https://expense-tracker-three-vert-61.vercel.app)**
 
+> **Try it instantly** — sign in with **`demo@expense-tracker.app`** / **`demo1234`**.
+> The account is pre-loaded with two accounts, three months of transactions,
+> budgets, a transfer, and auto-detected subscriptions — so the dashboard,
+> reports, and charts are populated the moment you log in.
+
 A full-stack personal finance app: track income and expenses across accounts,
 move money between them, set per-category budgets, view monthly reports and
 cashflow charts, import bank statements, and auto-detect recurring subscriptions.
