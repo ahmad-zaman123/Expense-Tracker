@@ -18,9 +18,9 @@ function DashboardPreview() {
   return (
     <div className="w-full max-w-md rotate-1 rounded-2xl border border-slate-200 bg-white shadow-xl">
       <div className="flex items-center gap-1.5 border-b border-slate-100 px-4 py-3">
-        <span className="h-2.5 w-2.5 rounded-full bg-slate-200" />
-        <span className="h-2.5 w-2.5 rounded-full bg-slate-200" />
-        <span className="h-2.5 w-2.5 rounded-full bg-slate-200" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
         <span className="ml-2 text-xs font-semibold text-slate-400">Dashboard</span>
       </div>
       <div className="space-y-4 p-5">
