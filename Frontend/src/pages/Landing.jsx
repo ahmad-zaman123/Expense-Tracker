@@ -1,4 +1,6 @@
-import { Link } from "react-router-dom"
+import { Link, Navigate } from "react-router-dom"
+
+import { useAuth } from "../auth/AuthContext"
 
 function LogoMark() {
   return (
@@ -54,6 +56,12 @@ function DashboardPreview() {
 }
 
 function Landing() {
+  const { isAuthenticated } = useAuth()
+
+  if (isAuthenticated) {
+    return <Navigate to="/app" replace />
+  }
+
   return (
     <div className="relative flex min-h-screen flex-col overflow-hidden bg-slate-50">
       <div className="pointer-events-none absolute -top-40 left-1/2 h-[480px] w-[900px] -translate-x-1/2 rounded-full bg-emerald-200/40 blur-3xl" />
