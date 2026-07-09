@@ -308,7 +308,7 @@ function Transactions() {
                     <td
                       className={
                         "py-2 pr-4 text-right font-medium " +
-                        (transaction.kind === "INCOME" ? "text-emerald-600" : "text-slate-900")
+                        (transaction.kind === "INCOME" ? "text-emerald-600" : "text-rose-600")
                       }
                     >
                       {transaction.kind === "INCOME" ? "+" : "−"}
