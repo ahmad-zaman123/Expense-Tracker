@@ -58,7 +58,7 @@ function Landing() {
     <div className="relative flex min-h-screen flex-col overflow-hidden bg-slate-50">
       <div className="pointer-events-none absolute -top-40 left-1/2 h-[480px] w-[900px] -translate-x-1/2 rounded-full bg-emerald-200/40 blur-3xl" />
 
-      <header className="relative mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+      <header className="relative mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-5">
         <div className="flex items-center gap-2.5">
           <LogoMark />
           <span className="text-lg font-bold tracking-tight text-slate-900">Expense Tracker</span>
