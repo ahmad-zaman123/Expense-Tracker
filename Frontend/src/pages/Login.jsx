@@ -1,16 +1,20 @@
 import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 
 import { useAuth } from "../auth/AuthContext"
 import AuthShell from "../components/AuthShell.jsx"
 import { Alert, Button, TextField } from "../components/ui.jsx"
 import { formatError } from "../utils/errors"
 
+const DEMO_EMAIL = "demo@expense-tracker.app"
+const DEMO_PASSWORD = "demo1234"
+
 function Login() {
   const { login } = useAuth()
   const navigate = useNavigate()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const { state } = useLocation()
+  const [email, setEmail] = useState(state?.demo ? DEMO_EMAIL : "")
+  const [password, setPassword] = useState(state?.demo ? DEMO_PASSWORD : "")
   const [error, setError] = useState("")
   const [submitting, setSubmitting] = useState(false)
 
