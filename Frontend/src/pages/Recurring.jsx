@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 
 import { dismissRecurring, listRecurring } from "../api/recurring"
-import { Alert, PageHead } from "../components/ui.jsx"
+import { Alert, DeleteButton, PageHead } from "../components/ui.jsx"
 import { formatError } from "../utils/errors"
 import { formatMoney } from "../utils/format"
 
@@ -81,7 +81,7 @@ function Recurring() {
                     {rule.payee}
                     <span className="sub">{rule.sample_count} charges seen</span>
                   </td>
-                  <td className="num out">{formatMoney(rule.avg_amount)}</td>
+                  <td className={"num " + (rule.kind === "INCOME" ? "in" : "out")}>{formatMoney(rule.avg_amount)}</td>
                   <td>{rule.cadence_days} days</td>
                   <td>
                     <span className="day">{rule.next_expected_at}</span>
