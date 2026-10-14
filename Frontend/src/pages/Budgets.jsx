@@ -2,9 +2,10 @@ import { useEffect, useState } from "react"
 
 import { createBudget, deleteBudget, listCategories } from "../api/finance"
 import { budgetStatus } from "../api/reports"
-import { Alert, Button, DeleteButton, PageHead, SelectField, TextField } from "../components/ui.jsx"
+import { Alert, Button, DeleteButton, PageHead, SelectField, TextField , TableWrap } from "../components/ui.jsx"
 import { formatError } from "../utils/errors"
 import { formatMoney } from "../utils/format"
+import { useDocumentTitle } from "../utils/useDocumentTitle"
 
 function Meter({ percent }) {
   const value = Number(percent)
@@ -31,6 +32,7 @@ function stateOf(status) {
 }
 
 function Budgets() {
+  useDocumentTitle("Budgets")
   const [statuses, setStatuses] = useState([])
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
@@ -123,8 +125,8 @@ function Budgets() {
       ) : statuses.length === 0 ? (
         <p className="empty-row">No budgets yet. Pick a category and a monthly limit above.</p>
       ) : (
-        <div className="table-wrap">
-          <table className="ledger">
+        <TableWrap label="Budgets">
+          <table className="ledger stack">
             <thead>
               <tr>
                 <th>Category</th>
@@ -140,11 +142,11 @@ function Budgets() {
                 const state = stateOf(status)
                 return (
                   <tr key={status.budget_id}>
-                    <td>{status.category_name}</td>
-                    <td className="num">{formatMoney(status.limit)}</td>
-                    <td className="num out">{formatMoney(status.spent)}</td>
-                    <td className="num">{formatMoney(status.remaining)}</td>
-                    <td style={{ minWidth: "11rem" }}>
+                    <td data-label="Category">{status.category_name}</td>
+                    <td data-label="Limit" className="num">{formatMoney(status.limit)}</td>
+                    <td data-label="Spent" className="num out">{formatMoney(status.spent)}</td>
+                    <td data-label="Left" className="num">{formatMoney(status.remaining)}</td>
+                    <td data-label="Used" style={{ minWidth: "11rem" }}>
                       <Meter percent={status.percent_used} />
                       <span className={"state " + state.level}>
                         {status.percent_used}% · {state.text}
@@ -158,7 +160,7 @@ function Budgets() {
               })}
             </tbody>
           </table>
-        </div>
+        </TableWrap>
       )}
     </div>
   )

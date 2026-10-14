@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react"
 
 import { createAccount, deleteAccount, listAccounts } from "../api/finance"
-import { Alert, Button, DeleteButton, PageHead, TextField } from "../components/ui.jsx"
+import { Alert, Button, DeleteButton, PageHead, TextField , TableWrap } from "../components/ui.jsx"
 import { formatError } from "../utils/errors"
 import { formatMoney } from "../utils/format"
+import { useDocumentTitle } from "../utils/useDocumentTitle"
 
 function Accounts() {
+  useDocumentTitle("Accounts")
   const [accounts, setAccounts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
@@ -91,8 +93,8 @@ function Accounts() {
       ) : accounts.length === 0 ? (
         <p className="empty-row">No accounts yet. Add your first one above and give it an opening balance.</p>
       ) : (
-        <div className="table-wrap">
-          <table className="ledger">
+        <TableWrap label="Accounts">
+          <table className="ledger stack">
             <thead>
               <tr>
                 <th>Account</th>
@@ -104,9 +106,9 @@ function Accounts() {
             <tbody>
               {accounts.map((account) => (
                 <tr key={account.id}>
-                  <td>{account.name}</td>
-                  <td className="num">{formatMoney(account.opening_balance)}</td>
-                  <td className="num" style={{ fontWeight: 700 }}>
+                  <td data-label="Account">{account.name}</td>
+                  <td data-label="Opening" className="num">{formatMoney(account.opening_balance)}</td>
+                  <td data-label="Balance" className="num" style={{ fontWeight: 700 }}>
                     {formatMoney(account.current_balance)}
                   </td>
                   <td className="act">
@@ -118,13 +120,13 @@ function Accounts() {
             <tfoot>
               <tr>
                 <td>Total</td>
-                <td />
-                <td className="num">{formatMoney(total)}</td>
+                <td data-label="Opening" />
+                <td data-label="Balance" className="num">{formatMoney(total)}</td>
                 <td />
               </tr>
             </tfoot>
           </table>
-        </div>
+        </TableWrap>
       )}
     </div>
   )

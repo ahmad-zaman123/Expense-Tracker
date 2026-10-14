@@ -3,9 +3,10 @@ import { useEffect, useRef, useState } from "react"
 import { listAccounts } from "../api/finance"
 import { cashflow, monthlyReport } from "../api/reports"
 import CashflowChart from "../components/CashflowChart.jsx"
-import { PageHead, TextField } from "../components/ui.jsx"
+import { PageHead, TextField , TableWrap } from "../components/ui.jsx"
 import { currentMonth, recentMonthsRange } from "../utils/date"
 import { formatMoney } from "../utils/format"
+import { useDocumentTitle } from "../utils/useDocumentTitle"
 
 function Total({ label, value, hint }) {
   return (
@@ -18,6 +19,7 @@ function Total({ label, value, hint }) {
 }
 
 function Dashboard() {
+  useDocumentTitle("Dashboard")
   const [accounts, setAccounts] = useState([])
   const [month, setMonth] = useState(currentMonth())
   const [monthly, setMonthly] = useState(null)
@@ -105,8 +107,8 @@ function Dashboard() {
         ) : (
           <>
             <CashflowChart data={chartData} />
-            <div className="table-wrap" style={{ marginTop: "1rem" }}>
-              <table className="ledger">
+            <TableWrap label="Six-month totals" style={{ marginTop: "1rem" }}>
+              <table className="ledger stack">
                 <thead>
                   <tr>
                     <th>Month</th>
@@ -120,16 +122,16 @@ function Dashboard() {
                     const net = row.income - row.expense
                     return (
                       <tr key={row.month}>
-                        <td className="day">{row.month}</td>
-                        <td className="num in">{formatMoney(row.income)}</td>
-                        <td className="num out">{formatMoney(row.expense)}</td>
-                        <td className="num">{(net < 0 ? "−" : "") + formatMoney(Math.abs(net))}</td>
+                        <td data-label="Month" className="day">{row.month}</td>
+                        <td data-label="In" className="num in">{formatMoney(row.income)}</td>
+                        <td data-label="Out" className="num out">{formatMoney(row.expense)}</td>
+                        <td data-label="Net" className="num">{(net < 0 ? "−" : "") + formatMoney(Math.abs(net))}</td>
                       </tr>
                     )
                   })}
                 </tbody>
               </table>
-            </div>
+            </TableWrap>
           </>
         )}
       </section>

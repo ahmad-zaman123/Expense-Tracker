@@ -5,11 +5,13 @@ import { useAuth } from "../auth/AuthContext"
 import AuthShell from "../components/AuthShell.jsx"
 import { Alert, Button, TextField } from "../components/ui.jsx"
 import { formatError } from "../utils/errors"
+import { useDocumentTitle } from "../utils/useDocumentTitle"
 
 const DEMO_EMAIL = "demo@expense-tracker.app"
 const DEMO_PASSWORD = "demo1234"
 
 function Login() {
+  useDocumentTitle("Sign in")
   const { login } = useAuth()
   const navigate = useNavigate()
   const { state } = useLocation()
