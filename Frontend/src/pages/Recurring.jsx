@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 
 import { dismissRecurring, listRecurring } from "../api/recurring"
-import { Alert, DeleteButton, PageHead } from "../components/ui.jsx"
+import { Alert, DeleteButton, PageHead , TableWrap } from "../components/ui.jsx"
 import { formatError } from "../utils/errors"
 import { formatMoney } from "../utils/format"
 
@@ -68,8 +68,8 @@ function Recurring() {
           transactions, it shows up here.
         </p>
       ) : (
-        <div className="table-wrap">
-          <table className="ledger">
+        <TableWrap label="Recurring charges">
+          <table className="ledger stack">
             <thead>
               <tr>
                 <th>Payee</th>
@@ -83,19 +83,19 @@ function Recurring() {
             <tbody>
               {rules.map((rule) => (
                 <tr key={rule.id}>
-                  <td>
+                  <td data-label="Payee">
                     {rule.payee}
                     <span className="sub">{rule.sample_count} charges seen</span>
                   </td>
-                  <td className={"num " + (rule.kind === "INCOME" ? "in" : "out")}>{formatMoney(rule.avg_amount)}</td>
-                  <td>{rule.cadence_days} days</td>
-                  <td>
+                  <td data-label="About" className={"num " + (rule.kind === "INCOME" ? "in" : "out")}>{formatMoney(rule.avg_amount)}</td>
+                  <td data-label="Every">{rule.cadence_days} days</td>
+                  <td data-label="Next due">
                     <span className="day">{rule.next_expected_at}</span>
                     <span className={"sub state " + dueState(rule.next_expected_at, rule.cadence_days).level}>
                       {dueState(rule.next_expected_at, rule.cadence_days).text}
                     </span>
                   </td>
-                  <td className="num">{Math.round(Number(rule.confidence) * 100)}%</td>
+                  <td data-label="Confidence" className="num">{Math.round(Number(rule.confidence) * 100)}%</td>
                   <td className="act">
                     <DeleteButton label="Dismiss" what="charge" onConfirm={() => handleDismiss(rule.id)} />
                   </td>
@@ -103,7 +103,7 @@ function Recurring() {
               ))}
             </tbody>
           </table>
-        </div>
+        </TableWrap>
       )}
     </div>
   )

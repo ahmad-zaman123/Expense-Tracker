@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 
 import { createTransfer, deleteTransfer, listAccounts, listTransfers } from "../api/finance"
-import { Alert, Button, DeleteButton, PageHead, SelectField, TextField } from "../components/ui.jsx"
+import { Alert, Button, DeleteButton, PageHead, SelectField, TextField , TableWrap } from "../components/ui.jsx"
 import { todayISODate } from "../utils/date"
 import { formatError } from "../utils/errors"
 import { formatMoney } from "../utils/format"
@@ -117,8 +117,8 @@ function Transfers() {
       ) : transfers.length === 0 ? (
         <p className="empty-row">No transfers yet.</p>
       ) : (
-        <div className="table-wrap">
-          <table className="ledger">
+        <TableWrap label="Transfers">
+          <table className="ledger stack">
             <thead>
               <tr>
                 <th>Date</th>
@@ -131,10 +131,10 @@ function Transfers() {
             <tbody>
               {transfers.map((transfer) => (
                 <tr key={transfer.id}>
-                  <td className="day">{transfer.occurred_at.slice(0, 10)}</td>
-                  <td>{transfer.from_account.name}</td>
-                  <td>{transfer.to_account.name}</td>
-                  <td className="num">{formatMoney(transfer.amount)}</td>
+                  <td data-label="Date" className="day">{transfer.occurred_at.slice(0, 10)}</td>
+                  <td data-label="From">{transfer.from_account.name}</td>
+                  <td data-label="To">{transfer.to_account.name}</td>
+                  <td data-label="Amount" className="num">{formatMoney(transfer.amount)}</td>
                   <td className="act">
                     <DeleteButton what="transfer" onConfirm={() => handleDelete(transfer.id)} />
                   </td>
@@ -142,7 +142,7 @@ function Transfers() {
               ))}
             </tbody>
           </table>
-        </div>
+        </TableWrap>
       )}
     </div>
   )

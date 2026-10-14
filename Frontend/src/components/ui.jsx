@@ -1,4 +1,4 @@
-import { useId, useState } from "react"
+import { useId, useLayoutEffect, useRef, useState } from "react"
 
 function EyeIcon({ off }) {
   return (
@@ -83,6 +83,31 @@ export function PageHead({ title, children }) {
     <div className="page-head">
       <h1>{title}</h1>
       {children ? <p>{children}</p> : null}
+    </div>
+  )
+}
+
+/**
+ * Wraps a wide table. It only becomes a keyboard stop (with a name) when the table actually
+ * overflows, so people who cannot use a mouse can still scroll it.
+ */
+export function TableWrap({ label, style, children }) {
+  const ref = useRef(null)
+  const [scrolls, setScrolls] = useState(false)
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (!el || typeof ResizeObserver === "undefined") return undefined
+    const check = () => setScrolls(el.scrollWidth > el.clientWidth + 1)
+    check()
+    const observer = new ResizeObserver(check)
+    observer.observe(el)
+    if (el.firstElementChild) observer.observe(el.firstElementChild)
+    return () => observer.disconnect()
+  }, [])
+  const focusable = scrolls ? { tabIndex: 0, role: "region", "aria-label": label + " (scrolls sideways)" } : {}
+  return (
+    <div ref={ref} className="table-wrap" style={style} {...focusable}>
+      {children}
     </div>
   )
 }

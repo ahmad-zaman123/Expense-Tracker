@@ -8,7 +8,7 @@ import {
   listCategories,
   listTransactions,
 } from "../api/finance"
-import { Alert, Button, DeleteButton, Fold, PageHead, SelectField, TextField } from "../components/ui.jsx"
+import { Alert, Button, DeleteButton, Fold, PageHead, SelectField, TextField , TableWrap } from "../components/ui.jsx"
 import { todayISODate } from "../utils/date"
 import { formatError } from "../utils/errors"
 import { formatMoney } from "../utils/format"
@@ -281,8 +281,8 @@ function Transactions() {
         ) : transactions.length === 0 ? (
           <p className="empty-row">No transactions match these filters. Open New entry above to add one.</p>
         ) : (
-          <div className="table-wrap">
-            <table className="ledger">
+          <TableWrap label="Transactions">
+            <table className="ledger stack">
               <thead>
                 <tr>
                   <th>Date</th>
@@ -298,11 +298,11 @@ function Transactions() {
                   const isIncome = transaction.kind === "INCOME"
                   return (
                     <tr key={transaction.id}>
-                      <td className="day">{transaction.occurred_at.slice(0, 10)}</td>
-                      <td>{transaction.payee || transaction.description || "—"}</td>
-                      <td className="muted">{transaction.category?.name || "—"}</td>
-                      <td className="num out">{isIncome ? "" : formatMoney(transaction.amount)}</td>
-                      <td className="num in">{isIncome ? formatMoney(transaction.amount) : ""}</td>
+                      <td data-label="Date" className="day">{transaction.occurred_at.slice(0, 10)}</td>
+                      <td data-label="Particulars">{transaction.payee || transaction.description || "—"}</td>
+                      <td data-label="Category" className="muted">{transaction.category?.name || "—"}</td>
+                      <td data-label="Out" className="num out">{isIncome ? "" : formatMoney(transaction.amount)}</td>
+                      <td data-label="In" className="num in">{isIncome ? formatMoney(transaction.amount) : ""}</td>
                       <td className="act">
                         <DeleteButton what="entry" onConfirm={() => handleDelete(transaction.id)} />
                       </td>
@@ -313,13 +313,13 @@ function Transactions() {
               <tfoot>
                 <tr>
                   <td colSpan={3}>Total of the lines shown</td>
-                  <td className="num">{formatMoney(sums.out)}</td>
-                  <td className="num">{formatMoney(sums.in)}</td>
+                  <td data-label="Out" className="num">{formatMoney(sums.out)}</td>
+                  <td data-label="In" className="num">{formatMoney(sums.in)}</td>
                   <td />
                 </tr>
               </tfoot>
             </table>
-          </div>
+          </TableWrap>
         )}
       </section>
     </div>

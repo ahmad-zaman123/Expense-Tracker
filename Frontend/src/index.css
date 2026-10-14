@@ -209,3 +209,21 @@ table.ledger { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
   .tabs { flex-wrap: wrap; overflow: visible; }
   .tab { flex: 1 1 30%; text-align: center; }
 }
+
+/* On phones a ledger row stacks into labelled lines, so the amounts are never off-screen. */
+@media (max-width: 40rem) {
+  .ledger.stack thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .ledger.stack, .ledger.stack tbody, .ledger.stack tfoot { display: block; }
+  .ledger.stack tr { display: block; padding: 0.7rem 0; border-bottom: 1px solid var(--rule); }
+  .ledger.stack td { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: 0.15rem 0; border: 0; text-align: right; }
+  .ledger.stack td::before { content: attr(data-label); flex: none; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-2); text-align: left; }
+  .ledger.stack td:not([data-label])::before { content: none; }
+  .ledger.stack td:empty { display: none; }
+  .ledger.stack td.num { padding-right: 0; }
+  .ledger.stack td:first-child { font-weight: 700; }
+  .ledger.stack td.act { justify-content: flex-end; padding-top: 0.45rem; }
+  .ledger.stack td .sub { display: inline; margin-left: 0.4rem; }
+  .ledger.stack tfoot tr { border-top: 1px solid var(--rule-strong); border-bottom: 3px double var(--rule-strong); }
+  .ledger.stack tfoot td { border: 0; }
+  .ledger.stack td[colspan] { justify-content: flex-start; }
+}
