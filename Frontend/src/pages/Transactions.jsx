@@ -8,7 +8,7 @@ import {
   listCategories,
   listTransactions,
 } from "../api/finance"
-import { Alert, Button, DeleteButton, PageHead, SelectField, TextField } from "../components/ui.jsx"
+import { Alert, Button, DeleteButton, Fold, PageHead, SelectField, TextField } from "../components/ui.jsx"
 import { todayISODate } from "../utils/date"
 import { formatError } from "../utils/errors"
 import { formatMoney } from "../utils/format"
@@ -155,8 +155,7 @@ function Transactions() {
 
       <Alert>{error}</Alert>
 
-      <section>
-        <h2 className="entry-title">New entry</h2>
+      <Fold title="New entry">
         <form onSubmit={handleAdd} className="entry" aria-label="Add a transaction">
           <SelectField label="Kind" value={form.kind} onChange={(e) => updateForm("kind", e.target.value)}>
             <option value="EXPENSE">Expense (out)</option>
@@ -214,10 +213,9 @@ function Transactions() {
             </Button>
           </div>
         </form>
-      </section>
+      </Fold>
 
-      <section>
-        <h2 className="entry-title">Import a CSV statement</h2>
+      <Fold title="Import a CSV statement">
         <form onSubmit={handleImport} className="entry" aria-label="Import a CSV statement">
           <SelectField
             label="Into account"
@@ -262,7 +260,7 @@ function Transactions() {
             {importSummary.errors?.length ? ", " + importSummary.errors.length + " row error(s)" : ""}.
           </p>
         ) : null}
-      </section>
+      </Fold>
 
       <section>
         <h2 className="entry-title">The ledger</h2>
@@ -281,7 +279,7 @@ function Transactions() {
         {loading ? (
           <p className="note">Loading the ledger…</p>
         ) : transactions.length === 0 ? (
-          <p className="empty-row">No transactions match these filters.</p>
+          <p className="empty-row">No transactions match these filters. Open New entry above to add one.</p>
         ) : (
           <div className="table-wrap">
             <table className="ledger">

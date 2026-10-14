@@ -109,6 +109,17 @@ export function DeleteButton({ onConfirm, what = "entry", label = "Delete", conf
   )
 }
 
+/** A section that stays folded until it is needed, so the ledger is what the page opens on. */
+export function Fold({ title, defaultOpen = false, children }) {
+  const [open, setOpen] = useState(defaultOpen)
+  return (
+    <details className="fold" open={open} onToggle={(event) => setOpen(event.currentTarget.open)}>
+      <summary>{title}</summary>
+      <div className="fold-body">{children}</div>
+    </details>
+  )
+}
+
 /** Kept for compatibility: a plain section. */
 export function Card({ children, className = "" }) {
   return <section className={className}>{children}</section>
