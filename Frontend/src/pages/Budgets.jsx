@@ -5,6 +5,7 @@ import { budgetStatus } from "../api/reports"
 import { Alert, Button, DeleteButton, PageHead, SelectField, TextField , TableWrap } from "../components/ui.jsx"
 import { formatError } from "../utils/errors"
 import { formatMoney } from "../utils/format"
+import { useDocumentTitle } from "../utils/useDocumentTitle"
 
 function Meter({ percent }) {
   const value = Number(percent)
@@ -31,6 +32,7 @@ function stateOf(status) {
 }
 
 function Budgets() {
+  useDocumentTitle("Budgets")
   const [statuses, setStatuses] = useState([])
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)

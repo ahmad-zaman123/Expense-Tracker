@@ -6,6 +6,7 @@ import CashflowChart from "../components/CashflowChart.jsx"
 import { PageHead, TextField , TableWrap } from "../components/ui.jsx"
 import { currentMonth, recentMonthsRange } from "../utils/date"
 import { formatMoney } from "../utils/format"
+import { useDocumentTitle } from "../utils/useDocumentTitle"
 
 function Total({ label, value, hint }) {
   return (
@@ -18,6 +19,7 @@ function Total({ label, value, hint }) {
 }
 
 function Dashboard() {
+  useDocumentTitle("Dashboard")
   const [accounts, setAccounts] = useState([])
   const [month, setMonth] = useState(currentMonth())
   const [monthly, setMonthly] = useState(null)

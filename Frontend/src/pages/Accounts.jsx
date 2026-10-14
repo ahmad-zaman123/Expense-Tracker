@@ -4,8 +4,10 @@ import { createAccount, deleteAccount, listAccounts } from "../api/finance"
 import { Alert, Button, DeleteButton, PageHead, TextField , TableWrap } from "../components/ui.jsx"
 import { formatError } from "../utils/errors"
 import { formatMoney } from "../utils/format"
+import { useDocumentTitle } from "../utils/useDocumentTitle"
 
 function Accounts() {
+  useDocumentTitle("Accounts")
   const [accounts, setAccounts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")

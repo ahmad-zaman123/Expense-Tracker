@@ -12,6 +12,7 @@ import { Alert, Button, DeleteButton, Fold, PageHead, SelectField, TextField , T
 import { todayISODate } from "../utils/date"
 import { formatError } from "../utils/errors"
 import { formatMoney } from "../utils/format"
+import { useDocumentTitle } from "../utils/useDocumentTitle"
 
 function monthBounds(month) {
   if (!month) {
@@ -36,6 +37,7 @@ const EMPTY_FORM = {
 }
 
 function Transactions() {
+  useDocumentTitle("Transactions")
   const [transactions, setTransactions] = useState([])
   const [accounts, setAccounts] = useState([])
   const [categories, setCategories] = useState([])

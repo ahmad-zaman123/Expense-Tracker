@@ -97,7 +97,7 @@ a { color: var(--focus); }
 .entry { display: grid; gap: 0.75rem 1rem; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); align-items: end; padding: 1rem 0; border-top: 2px solid var(--rule-strong); border-bottom: 1px solid var(--rule); }
 .entry-title { margin: 0 0 0.5rem; font-family: var(--serif); font-weight: 600; font-size: 1.1rem; }
 .field { display: block; }
-.field-label { display: block; margin-bottom: 0.25rem; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-2); }
+.field-label { display: block; margin-bottom: 0.25rem; font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-2); }
 .input, .select {
   box-sizing: border-box; width: 100%; min-height: 2.5rem; padding: 0.45rem 0.65rem; font: inherit; color: var(--ink);
   background: var(--paper); border: 1px solid var(--ink-2); border-radius: 2px;
@@ -125,7 +125,7 @@ a { color: var(--focus); }
 .table-wrap { overflow-x: auto; }
 table.ledger { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
 .ledger caption { text-align: left; padding: 0 0 0.5rem; font-family: var(--serif); font-weight: 600; font-size: 1.1rem; }
-.ledger th { text-align: left; padding: 0.55rem 0.75rem 0.55rem 0; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-2); border-top: 2px solid var(--rule-strong); border-bottom: 1px solid var(--rule-strong); white-space: nowrap; }
+.ledger th { text-align: left; padding: 0.55rem 0.75rem 0.55rem 0; font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-2); border-top: 2px solid var(--rule-strong); border-bottom: 1px solid var(--rule-strong); white-space: nowrap; }
 .ledger td { padding: 0.6rem 0.75rem 0.6rem 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
 .ledger .num { text-align: right; white-space: nowrap; }
 .ledger th.num { padding-right: 0.75rem; }
@@ -144,7 +144,7 @@ table.ledger { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
 .total { padding: 0.8rem 0.9rem 0.8rem 0; }
 .total + .total { padding-left: 0.9rem; border-left: 1px solid var(--rule); }
 @media (max-width: 40rem) { .total:nth-child(3) { padding-left: 0; border-left: none; } .total:nth-child(n+3) { border-top: 1px solid var(--rule); } }
-.total-label { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-2); }
+.total-label { font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-2); }
 .total-value { font-family: var(--serif); font-weight: 700; font-size: clamp(1.25rem, 2.4vw, 1.7rem); line-height: 1.25; }
 .total-hint { color: var(--muted); font-size: 0.82rem; }
 
@@ -153,7 +153,7 @@ table.ledger { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
 .meter > i { display: block; height: 100%; background: var(--ink-2); }
 .meter.near > i { background: repeating-linear-gradient(90deg, var(--ink-2) 0 5px, transparent 5px 8px); }
 .meter.over > i { background: repeating-linear-gradient(45deg, var(--over) 0 5px, transparent 5px 8px); }
-.state { font-size: 0.82rem; font-weight: 700; }
+.state { font-size: 0.8125rem; font-weight: 700; }
 .state.over { color: var(--over); }
 .state.near { color: var(--warn-text); }
 
@@ -216,7 +216,7 @@ table.ledger { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
   .ledger.stack, .ledger.stack tbody, .ledger.stack tfoot { display: block; }
   .ledger.stack tr { display: block; padding: 0.7rem 0; border-bottom: 1px solid var(--rule); }
   .ledger.stack td { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: 0.15rem 0; border: 0; text-align: right; }
-  .ledger.stack td::before { content: attr(data-label); flex: none; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-2); text-align: left; }
+  .ledger.stack td::before { content: attr(data-label); flex: none; font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-2); text-align: left; }
   .ledger.stack td:not([data-label])::before { content: none; }
   .ledger.stack td:empty { display: none; }
   .ledger.stack td.num { padding-right: 0; }
@@ -226,4 +226,13 @@ table.ledger { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
   .ledger.stack tfoot tr { border-top: 1px solid var(--rule-strong); border-bottom: 3px double var(--rule-strong); }
   .ledger.stack tfoot td { border: 0; }
   .ledger.stack td[colspan] { justify-content: flex-start; }
+}
+
+/* Touch screens: give every small control a comfortable target without changing desktop density. */
+@media (pointer: coarse) {
+  .text-btn { min-height: 2.5rem; padding: 0 0.5rem; display: inline-flex; align-items: center; }
+  .band-btn { min-height: 2.5rem; }
+  .tab { min-height: 2.75rem; display: flex; align-items: center; justify-content: center; }
+  .reveal { width: 2.75rem; height: 2.75rem; }
+  .back-link { min-height: 2.75rem; }
 }

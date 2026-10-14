@@ -5,8 +5,10 @@ import { useAuth } from "../auth/AuthContext"
 import AuthShell from "../components/AuthShell.jsx"
 import { Alert, Button, TextField } from "../components/ui.jsx"
 import { formatError } from "../utils/errors"
+import { useDocumentTitle } from "../utils/useDocumentTitle"
 
 function Register() {
+  useDocumentTitle("Create account")
   const { register } = useAuth()
   const navigate = useNavigate()
   const [fullName, setFullName] = useState("")

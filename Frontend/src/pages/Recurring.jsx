@@ -4,6 +4,7 @@ import { dismissRecurring, listRecurring } from "../api/recurring"
 import { Alert, DeleteButton, PageHead , TableWrap } from "../components/ui.jsx"
 import { formatError } from "../utils/errors"
 import { formatMoney } from "../utils/format"
+import { useDocumentTitle } from "../utils/useDocumentTitle"
 
 // Where the next expected charge stands, in calm words. A charge that is long overdue has most
 // likely stopped (a cancelled subscription), so say that rather than "expected 75 days ago".
@@ -16,12 +17,13 @@ function dueState(iso, cadenceDays) {
   if (days === 0) return { level: "near", text: "Due today" }
   const late = -days
   if (late > Math.max(Number(cadenceDays) || 0, 14)) {
-    return { level: "ok", text: "No recent charge. It may have stopped." }
+    return { level: "ok", text: "May have stopped" }
   }
   return { level: "near", text: "Due " + plural(late) + " ago" }
 }
 
 function Recurring() {
+  useDocumentTitle("Recurring")
   const [rules, setRules] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")

@@ -5,8 +5,10 @@ import { Alert, Button, DeleteButton, PageHead, SelectField, TextField , TableWr
 import { todayISODate } from "../utils/date"
 import { formatError } from "../utils/errors"
 import { formatMoney } from "../utils/format"
+import { useDocumentTitle } from "../utils/useDocumentTitle"
 
 function Transfers() {
+  useDocumentTitle("Transfers")
   const [transfers, setTransfers] = useState([])
   const [accounts, setAccounts] = useState([])
   const [loading, setLoading] = useState(true)
