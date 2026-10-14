@@ -5,14 +5,20 @@ import { Alert, DeleteButton, PageHead } from "../components/ui.jsx"
 import { formatError } from "../utils/errors"
 import { formatMoney } from "../utils/format"
 
-// How far away the next expected charge is, in words.
-function dueState(iso) {
+// Where the next expected charge stands, in calm words. A charge that is long overdue has most
+// likely stopped (a cancelled subscription), so say that rather than "expected 75 days ago".
+function dueState(iso, cadenceDays) {
   const days = Math.round((new Date(iso + "T00:00:00") - new Date().setHours(0, 0, 0, 0)) / 86400000)
   if (Number.isNaN(days)) return { level: "ok", text: "" }
-  if (days < 0) return { level: "near", text: "Expected " + Math.abs(days) + " day" + (days === -1 ? "" : "s") + " ago" }
+  const plural = (n) => n + " day" + (n === 1 ? "" : "s")
+  if (days > 7) return { level: "ok", text: "In " + plural(days) }
+  if (days > 0) return { level: "near", text: "Due in " + plural(days) }
   if (days === 0) return { level: "near", text: "Due today" }
-  if (days <= 7) return { level: "near", text: "Due in " + days + " day" + (days === 1 ? "" : "s") }
-  return { level: "ok", text: "In " + days + " days" }
+  const late = -days
+  if (late > Math.max(Number(cadenceDays) || 0, 14)) {
+    return { level: "ok", text: "No recent charge. It may have stopped." }
+  }
+  return { level: "near", text: "Due " + plural(late) + " ago" }
 }
 
 function Recurring() {
@@ -85,8 +91,8 @@ function Recurring() {
                   <td>{rule.cadence_days} days</td>
                   <td>
                     <span className="day">{rule.next_expected_at}</span>
-                    <span className={"sub state " + (dueState(rule.next_expected_at).level)}>
-                      {dueState(rule.next_expected_at).text}
+                    <span className={"sub state " + dueState(rule.next_expected_at, rule.cadence_days).level}>
+                      {dueState(rule.next_expected_at, rule.cadence_days).text}
                     </span>
                   </td>
                   <td className="num">{Math.round(Number(rule.confidence) * 100)}%</td>

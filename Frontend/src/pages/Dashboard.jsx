@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { listAccounts } from "../api/finance"
 import { cashflow, monthlyReport } from "../api/reports"
@@ -23,18 +23,29 @@ function Dashboard() {
   const [monthly, setMonthly] = useState(null)
   const [chartData, setChartData] = useState([])
   const [loading, setLoading] = useState(true)
+  const [autoMonth, setAutoMonth] = useState(false)
+  const monthTouched = useRef(false)
 
   useEffect(() => {
     Promise.all([listAccounts(), cashflow(recentMonthsRange(6))])
       .then(([accountData, cashflowData]) => {
         setAccounts(accountData.results)
-        setChartData(
-          cashflowData.map((row) => ({
-            month: row.period.slice(0, 7),
-            income: Number(row.income),
-            expense: Number(row.expense),
-          })),
-        )
+        const rows = cashflowData.map((row) => ({
+          month: row.period.slice(0, 7),
+          income: Number(row.income),
+          expense: Number(row.expense),
+        }))
+        setChartData(rows)
+        // If this month is empty, open on the latest month that has entries, so the totals
+        // above the chart are not a row of zeros next to a chart full of data.
+        const hasData = (row) => row.income > 0 || row.expense > 0
+        const now = currentMonth()
+        const latest = [...rows].reverse().find(hasData)
+        const thisMonthHasData = rows.some((row) => row.month === now && hasData(row))
+        if (latest && !thisMonthHasData && !monthTouched.current) {
+          setMonth(latest.month)
+          setAutoMonth(true)
+        }
       })
       .finally(() => setLoading(false))
   }, [])
@@ -57,10 +68,20 @@ function Dashboard() {
             label="Month"
             type="month"
             value={month}
-            onChange={(event) => setMonth(event.target.value)}
+            onChange={(event) => {
+              monthTouched.current = true
+              setAutoMonth(false)
+              setMonth(event.target.value)
+            }}
           />
         </div>
       </div>
+
+      {autoMonth ? (
+        <p className="note" role="status">
+          Showing {month}, the latest month with entries.
+        </p>
+      ) : null}
 
       <section aria-label={"Totals for " + month}>
         <div className="totals">

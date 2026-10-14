@@ -194,3 +194,18 @@ table.ledger { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
   color: var(--muted); font-weight: 600; font-size: 0.92rem; text-decoration: none;
 }
 .back-link:hover { color: var(--ink); }
+
+/* a section that stays folded until needed */
+.fold { border-top: 2px solid var(--rule-strong); border-bottom: 1px solid var(--rule); }
+.fold > summary { display: flex; justify-content: space-between; align-items: center; cursor: pointer; list-style: none; padding: 0.75rem 0; font-family: var(--serif); font-weight: 600; font-size: 1.1rem; }
+.fold > summary::-webkit-details-marker { display: none; }
+.fold > summary::after { content: "+"; font-family: var(--sans); font-weight: 400; font-size: 1.4rem; color: var(--muted); }
+.fold[open] > summary::after { content: "\2212"; }
+.fold-body { padding-bottom: 1rem; }
+.fold .entry { border-top: none; padding-top: 0; }
+
+/* on phones the tabs wrap instead of scrolling out of sight */
+@media (max-width: 40rem) {
+  .tabs { flex-wrap: wrap; overflow: visible; }
+  .tab { flex: 1 1 30%; text-align: center; }
+}
