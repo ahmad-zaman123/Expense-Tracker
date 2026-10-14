@@ -2,22 +2,32 @@ import { useEffect, useState } from "react"
 
 import { createBudget, deleteBudget, listCategories } from "../api/finance"
 import { budgetStatus } from "../api/reports"
-import { Alert, Button, Card, SelectField, TextField } from "../components/ui.jsx"
+import { Alert, Button, DeleteButton, PageHead, SelectField, TextField } from "../components/ui.jsx"
 import { formatError } from "../utils/errors"
 import { formatMoney } from "../utils/format"
 
-function ProgressBar({ percent }) {
+function Meter({ percent }) {
   const value = Number(percent)
-  const clamped = Math.min(value, 100)
-  const isOver = value > 100
+  const level = value > 100 ? "over" : value >= 80 ? "near" : "ok"
   return (
-    <div className="mt-2 h-2 w-full rounded-full bg-slate-100">
-      <div
-        className={"h-2 rounded-full " + (isOver ? "bg-red-500" : "bg-emerald-500")}
-        style={{ width: clamped + "%" }}
-      />
+    <div
+      className={"meter " + level}
+      role="progressbar"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={Math.min(Math.round(value), 100)}
+      aria-label="Budget used"
+    >
+      <i style={{ width: Math.min(value, 100) + "%" }} />
     </div>
   )
+}
+
+function stateOf(status) {
+  const value = Number(status.percent_used)
+  if (value > 100) return { level: "over", text: "Over by " + formatMoney(Math.abs(Number(status.remaining))) }
+  if (value >= 80) return { level: "near", text: "Nearly used" }
+  return { level: "ok", text: "On track" }
 }
 
 function Budgets() {
@@ -74,76 +84,80 @@ function Budgets() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Budgets</h1>
-        <p className="mt-1 text-slate-500">Monthly spending limits per expense category.</p>
-      </div>
+    <div className="stack">
+      <PageHead title="Budgets">Monthly spending limits per expense category.</PageHead>
 
       <Alert>{error}</Alert>
 
-      <Card>
-        <form onSubmit={handleAdd} className="flex flex-wrap items-end gap-3">
-          <div className="min-w-[180px] flex-1">
-            <SelectField
-              label="Category"
-              value={categoryId}
-              onChange={(event) => setCategoryId(event.target.value)}
-              required
-            >
-              <option value="">Select category</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </SelectField>
-          </div>
-          <div className="w-40">
-            <TextField
-              label="Monthly limit"
-              type="number"
-              step="0.01"
-              value={amount}
-              onChange={(event) => setAmount(event.target.value)}
-              required
-            />
-          </div>
+      <form onSubmit={handleAdd} className="entry" aria-label="Add a budget">
+        <SelectField
+          label="Category"
+          value={categoryId}
+          onChange={(event) => setCategoryId(event.target.value)}
+          required
+        >
+          <option value="">Select category</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
+        </SelectField>
+        <TextField
+          label="Monthly limit"
+          type="number"
+          step="0.01"
+          value={amount}
+          onChange={(event) => setAmount(event.target.value)}
+          required
+        />
+        <div>
           <Button type="submit" disabled={submitting}>
             {submitting ? "Adding…" : "Add budget"}
           </Button>
-        </form>
-      </Card>
+        </div>
+      </form>
 
       {loading ? (
-        <p className="text-slate-500">Loading…</p>
+        <p className="note">Loading the ledger…</p>
       ) : statuses.length === 0 ? (
-        <Card>
-          <p className="text-slate-500">No budgets yet. Add one above.</p>
-        </Card>
+        <p className="empty-row">No budgets yet. Pick a category and a monthly limit above.</p>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {statuses.map((status) => (
-            <Card key={status.budget_id}>
-              <div className="flex items-start justify-between">
-                <p className="font-medium text-slate-900">{status.category_name}</p>
-                <button
-                  onClick={() => handleDelete(status.budget_id)}
-                  className="text-sm text-slate-400 hover:text-red-600"
-                >
-                  Delete
-                </button>
-              </div>
-              <p className="mt-1 text-sm text-slate-500">
-                {formatMoney(status.spent)} of {formatMoney(status.limit)} · {status.percent_used}%
-                used
-              </p>
-              <ProgressBar percent={status.percent_used} />
-              <p className="mt-1 text-xs text-slate-400">
-                {formatMoney(status.remaining)} remaining
-              </p>
-            </Card>
-          ))}
+        <div className="table-wrap">
+          <table className="ledger">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th className="num">Limit</th>
+                <th className="num">Spent</th>
+                <th className="num">Left</th>
+                <th>Used</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {statuses.map((status) => {
+                const state = stateOf(status)
+                return (
+                  <tr key={status.budget_id}>
+                    <td>{status.category_name}</td>
+                    <td className="num">{formatMoney(status.limit)}</td>
+                    <td className="num out">{formatMoney(status.spent)}</td>
+                    <td className="num">{formatMoney(status.remaining)}</td>
+                    <td style={{ minWidth: "11rem" }}>
+                      <Meter percent={status.percent_used} />
+                      <span className={"state " + state.level}>
+                        {status.percent_used}% · {state.text}
+                      </span>
+                    </td>
+                    <td className="act">
+                      <DeleteButton what="budget" onConfirm={() => handleDelete(status.budget_id)} />
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

@@ -30,8 +30,8 @@ function Register() {
   }
 
   return (
-    <AuthShell title="Create account" subtitle="Start tracking your finances">
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <AuthShell title="Open a new ledger" subtitle="Start tracking your finances.">
+      <form onSubmit={handleSubmit} className="auth-form" style={{ display: "grid", gap: "0.9rem" }}>
         <Alert>{error}</Alert>
         <TextField
           label="Full name"
@@ -52,13 +52,13 @@ function Register() {
           onChange={(event) => setPassword(event.target.value)}
           required
         />
-        <Button type="submit" disabled={submitting} className="w-full">
+        <Button type="submit" disabled={submitting} className="full">
           {submitting ? "Creating…" : "Create account"}
         </Button>
       </form>
-      <p className="mt-4 text-center text-sm text-slate-500">
+      <p className="auth-alt">
         Already have an account?{" "}
-        <Link to="/login" className="font-medium text-emerald-600 hover:underline">
+        <Link to="/login" >
           Sign in
         </Link>
       </p>

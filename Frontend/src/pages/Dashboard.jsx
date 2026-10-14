@@ -3,17 +3,17 @@ import { useEffect, useState } from "react"
 import { listAccounts } from "../api/finance"
 import { cashflow, monthlyReport } from "../api/reports"
 import CashflowChart from "../components/CashflowChart.jsx"
-import { Card, TextField } from "../components/ui.jsx"
+import { PageHead, TextField } from "../components/ui.jsx"
 import { currentMonth, recentMonthsRange } from "../utils/date"
 import { formatMoney } from "../utils/format"
 
-function StatTile({ label, value, hint }) {
+function Total({ label, value, hint }) {
   return (
-    <Card>
-      <p className="text-sm text-slate-500">{label}</p>
-      <p className="mt-2 text-2xl font-bold text-slate-900">{value}</p>
-      {hint ? <p className="mt-1 text-xs text-slate-400">{hint}</p> : null}
-    </Card>
+    <div className="total">
+      <div className="total-label">{label}</div>
+      <div className="total-value">{value}</div>
+      {hint ? <div className="total-hint">{hint}</div> : null}
+    </div>
   )
 }
 
@@ -49,13 +49,10 @@ function Dashboard() {
   )
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
-          <p className="mt-1 text-slate-500">Your financial snapshot.</p>
-        </div>
-        <div className="w-40">
+    <div className="stack">
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", gap: "1rem" }}>
+        <PageHead title="Dashboard">Where the month stands, ruled off.</PageHead>
+        <div style={{ width: "10rem" }}>
           <TextField
             label="Month"
             type="month"
@@ -65,33 +62,56 @@ function Dashboard() {
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatTile
-          label="Total balance"
-          value={formatMoney(totalBalance)}
-          hint={accounts.length + " account" + (accounts.length === 1 ? "" : "s")}
-        />
-        <StatTile label="Income" value={monthly ? formatMoney(monthly.income) : "…"} hint={month} />
-        <StatTile
-          label="Expense"
-          value={monthly ? formatMoney(monthly.expense) : "…"}
-          hint={month}
-        />
-        <StatTile label="Net" value={monthly ? formatMoney(monthly.net) : "…"} hint={month} />
-      </div>
+      <section aria-label={"Totals for " + month}>
+        <div className="totals">
+          <Total label="In" value={monthly ? formatMoney(monthly.income) : "…"} hint={month} />
+          <Total label="Out" value={monthly ? formatMoney(monthly.expense) : "…"} hint={month} />
+          <Total label="Net" value={monthly ? formatMoney(monthly.net) : "…"} hint={month} />
+          <Total
+            label="Total balance"
+            value={formatMoney(totalBalance)}
+            hint={accounts.length + " account" + (accounts.length === 1 ? "" : "s")}
+          />
+        </div>
+      </section>
 
-      <Card>
-        <p className="mb-4 text-sm font-medium text-slate-700">
-          Income vs expense (last 6 months)
-        </p>
+      <section>
+        <h2 className="entry-title">The last six months</h2>
         {loading ? (
-          <p className="text-slate-500">Loading…</p>
+          <p className="note">Loading the ledger…</p>
         ) : chartData.length === 0 ? (
-          <p className="text-slate-500">No data yet — add some transactions.</p>
+          <p className="empty-row">Nothing recorded yet. Add a transaction and this page fills in.</p>
         ) : (
-          <CashflowChart data={chartData} />
+          <>
+            <CashflowChart data={chartData} />
+            <div className="table-wrap" style={{ marginTop: "1rem" }}>
+              <table className="ledger">
+                <thead>
+                  <tr>
+                    <th>Month</th>
+                    <th className="num">In</th>
+                    <th className="num">Out</th>
+                    <th className="num">Net</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {chartData.map((row) => {
+                    const net = row.income - row.expense
+                    return (
+                      <tr key={row.month}>
+                        <td className="day">{row.month}</td>
+                        <td className="num in">{formatMoney(row.income)}</td>
+                        <td className="num out">{formatMoney(row.expense)}</td>
+                        <td className="num">{(net < 0 ? "−" : "") + formatMoney(Math.abs(net))}</td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
-      </Card>
+      </section>
     </div>
   )
 }

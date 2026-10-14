@@ -8,7 +8,7 @@ import {
   listCategories,
   listTransactions,
 } from "../api/finance"
-import { Alert, Button, Card, SelectField, TextField } from "../components/ui.jsx"
+import { Alert, Button, DeleteButton, PageHead, SelectField, TextField } from "../components/ui.jsx"
 import { todayISODate } from "../utils/date"
 import { formatError } from "../utils/errors"
 import { formatMoney } from "../utils/format"
@@ -140,44 +140,47 @@ function Transactions() {
 
   const formCategories = categories.filter((category) => category.kind === form.kind)
 
+  const sums = transactions.reduce(
+    (acc, t) => {
+      if (t.kind === "INCOME") acc.in += Number(t.amount)
+      else acc.out += Number(t.amount)
+      return acc
+    },
+    { in: 0, out: 0 },
+  )
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Transactions</h1>
-        <p className="mt-1 text-slate-500">Record income and expenses, or import a statement.</p>
-      </div>
+    <div className="stack">
+      <PageHead title="Transactions">Record income and expenses, or import a bank statement.</PageHead>
 
       <Alert>{error}</Alert>
 
-      <Card>
-        <form onSubmit={handleAdd} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <SelectField
-            label="Kind"
-            value={form.kind}
-            onChange={(event) => updateForm("kind", event.target.value)}
-          >
-            <option value="EXPENSE">Expense</option>
-            <option value="INCOME">Income</option>
+      <section>
+        <h2 className="entry-title">New entry</h2>
+        <form onSubmit={handleAdd} className="entry" aria-label="Add a transaction">
+          <SelectField label="Kind" value={form.kind} onChange={(e) => updateForm("kind", e.target.value)}>
+            <option value="EXPENSE">Expense (out)</option>
+            <option value="INCOME">Income (in)</option>
           </SelectField>
           <TextField
             label="Amount"
             type="number"
             step="0.01"
             value={form.amount}
-            onChange={(event) => updateForm("amount", event.target.value)}
+            onChange={(e) => updateForm("amount", e.target.value)}
             required
           />
           <TextField
             label="Date"
             type="date"
             value={form.occurred_at}
-            onChange={(event) => updateForm("occurred_at", event.target.value)}
+            onChange={(e) => updateForm("occurred_at", e.target.value)}
             required
           />
           <SelectField
             label="Account"
             value={form.account_id}
-            onChange={(event) => updateForm("account_id", event.target.value)}
+            onChange={(e) => updateForm("account_id", e.target.value)}
             required
           >
             <option value="">Select account</option>
@@ -190,7 +193,7 @@ function Transactions() {
           <SelectField
             label="Category"
             value={form.category_id}
-            onChange={(event) => updateForm("category_id", event.target.value)}
+            onChange={(e) => updateForm("category_id", e.target.value)}
           >
             <option value="">Uncategorized</option>
             {formCategories.map((category) => (
@@ -202,133 +205,125 @@ function Transactions() {
           <TextField
             label="Payee"
             value={form.payee}
-            onChange={(event) => updateForm("payee", event.target.value)}
+            onChange={(e) => updateForm("payee", e.target.value)}
             placeholder="e.g. Netflix"
           />
-          <div className="flex items-end">
+          <div>
             <Button type="submit" disabled={submitting}>
               {submitting ? "Adding…" : "Add transaction"}
             </Button>
           </div>
         </form>
-      </Card>
+      </section>
 
-      <Card>
-        <p className="mb-3 text-sm font-medium text-slate-700">Import CSV statement</p>
-        <form onSubmit={handleImport} className="flex flex-wrap items-end gap-3">
-          <div className="min-w-[180px]">
-            <SelectField
-              label="Account"
-              value={importAccount}
-              onChange={(event) => setImportAccount(event.target.value)}
-              required
-            >
-              <option value="">Select account</option>
-              {accounts.map((account) => (
-                <option key={account.id} value={account.id}>
-                  {account.name}
-                </option>
-              ))}
-            </SelectField>
-          </div>
-          <input
-            type="file"
-            accept=".csv"
-            onChange={(event) => setImportFile(event.target.files[0] || null)}
+      <section>
+        <h2 className="entry-title">Import a CSV statement</h2>
+        <form onSubmit={handleImport} className="entry" aria-label="Import a CSV statement">
+          <SelectField
+            label="Into account"
+            value={importAccount}
+            onChange={(e) => setImportAccount(e.target.value)}
             required
-            className="text-sm text-slate-600"
-          />
-          <Button type="submit" disabled={importing || !importFile}>
-            {importing ? "Importing…" : "Import"}
-          </Button>
+          >
+            <option value="">Select account</option>
+            {accounts.map((account) => (
+              <option key={account.id} value={account.id}>
+                {account.name}
+              </option>
+            ))}
+          </SelectField>
+          <div className="field">
+            <label className="field-label" htmlFor="csv-file">
+              CSV file
+            </label>
+            <input
+              id="csv-file"
+              className="input"
+              type="file"
+              accept=".csv"
+              onChange={(e) => setImportFile(e.target.files[0] || null)}
+              required
+            />
+          </div>
+          <div>
+            <Button type="submit" disabled={importing || !importFile}>
+              {importing ? "Importing…" : "Import"}
+            </Button>
+          </div>
         </form>
+        <p className="note">
+          Needs a header row with <code>date</code> (YYYY-MM-DD) and <code>amount</code>; optional{" "}
+          <code>description</code>, <code>payee</code>, and <code>kind</code> (INCOME or EXPENSE, default
+          EXPENSE). Importing the same file twice adds nothing.
+        </p>
         {importSummary ? (
-          <p className="mt-3 text-sm text-slate-600">
-            Imported <span className="font-semibold text-emerald-700">{importSummary.created}</span>,
-            skipped {importSummary.skipped}
+          <p role="status" style={{ marginTop: "0.5rem" }}>
+            Imported <strong>{importSummary.created}</strong>, skipped {importSummary.skipped}
             {importSummary.errors?.length ? ", " + importSummary.errors.length + " row error(s)" : ""}.
           </p>
         ) : null}
-      </Card>
+      </section>
 
-      <Card>
-        <div className="mb-4 flex flex-wrap items-end gap-3">
-          <div className="w-40">
-            <TextField
-              label="Month"
-              type="month"
-              value={filterMonth}
-              onChange={(event) => setFilterMonth(event.target.value)}
-            />
-          </div>
-          <div className="w-48">
-            <SelectField
-              label="Category"
-              value={filterCategory}
-              onChange={(event) => setFilterCategory(event.target.value)}
-            >
-              <option value="">All categories</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </SelectField>
-          </div>
+      <section>
+        <h2 className="entry-title">The ledger</h2>
+        <div className="entry" style={{ borderTop: "none", paddingTop: 0 }}>
+          <TextField label="Month" type="month" value={filterMonth} onChange={(e) => setFilterMonth(e.target.value)} />
+          <SelectField label="Category" value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
+            <option value="">All categories</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </SelectField>
         </div>
 
         {loading ? (
-          <p className="text-slate-500">Loading…</p>
+          <p className="note">Loading the ledger…</p>
         ) : transactions.length === 0 ? (
-          <p className="text-slate-500">No transactions match these filters.</p>
+          <p className="empty-row">No transactions match these filters.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+          <div className="table-wrap">
+            <table className="ledger">
               <thead>
-                <tr className="border-b border-slate-200 text-left text-slate-500">
-                  <th className="py-2 pr-4 font-medium">Date</th>
-                  <th className="py-2 pr-4 font-medium">Payee / Description</th>
-                  <th className="py-2 pr-4 font-medium">Category</th>
-                  <th className="py-2 pr-4 text-right font-medium">Amount</th>
-                  <th className="py-2"></th>
+                <tr>
+                  <th>Date</th>
+                  <th>Particulars</th>
+                  <th>Category</th>
+                  <th className="num">Out</th>
+                  <th className="num">In</th>
+                  <th />
                 </tr>
               </thead>
               <tbody>
-                {transactions.map((transaction) => (
-                  <tr key={transaction.id} className="border-b border-slate-100">
-                    <td className="py-2 pr-4 text-slate-600">
-                      {transaction.occurred_at.slice(0, 10)}
-                    </td>
-                    <td className="py-2 pr-4 text-slate-900">
-                      {transaction.payee || transaction.description || "—"}
-                    </td>
-                    <td className="py-2 pr-4 text-slate-600">
-                      {transaction.category?.name || "—"}
-                    </td>
-                    <td
-                      className={
-                        "py-2 pr-4 text-right font-medium " +
-                        (transaction.kind === "INCOME" ? "text-emerald-600" : "text-rose-600")
-                      }
-                    >
-                      {transaction.kind === "INCOME" ? "+" : "−"}
-                      {formatMoney(transaction.amount)}
-                    </td>
-                    <td className="py-2 text-right">
-                      <button
-                        onClick={() => handleDelete(transaction.id)}
-                        className="text-slate-400 hover:text-red-600"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {transactions.map((transaction) => {
+                  const isIncome = transaction.kind === "INCOME"
+                  return (
+                    <tr key={transaction.id}>
+                      <td className="day">{transaction.occurred_at.slice(0, 10)}</td>
+                      <td>{transaction.payee || transaction.description || "—"}</td>
+                      <td className="muted">{transaction.category?.name || "—"}</td>
+                      <td className="num out">{isIncome ? "" : formatMoney(transaction.amount)}</td>
+                      <td className="num in">{isIncome ? formatMoney(transaction.amount) : ""}</td>
+                      <td className="act">
+                        <DeleteButton what="entry" onConfirm={() => handleDelete(transaction.id)} />
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
+              <tfoot>
+                <tr>
+                  <td colSpan={3}>Total of the lines shown</td>
+                  <td className="num">{formatMoney(sums.out)}</td>
+                  <td className="num">{formatMoney(sums.in)}</td>
+                  <td />
+                </tr>
+              </tfoot>
             </table>
           </div>
         )}
-      </Card>
+      </section>
     </div>
   )
 }

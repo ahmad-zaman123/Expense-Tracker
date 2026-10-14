@@ -33,14 +33,15 @@ function Login() {
   }
 
   return (
-    <AuthShell title="Sign in" subtitle="Welcome back">
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <AuthShell title="Sign in to your ledger" subtitle="Welcome back.">
+      <form onSubmit={handleSubmit} className="auth-form" style={{ display: "grid", gap: "0.9rem" }}>
         <Alert>{error}</Alert>
         <TextField
           label="Email"
           type="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
+          autoComplete="email"
           required
         />
         <TextField
@@ -48,15 +49,27 @@ function Login() {
           type="password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
+          autoComplete="current-password"
           required
         />
-        <Button type="submit" disabled={submitting} className="w-full">
+        <Button type="submit" disabled={submitting} className="full">
           {submitting ? "Signing in…" : "Sign in"}
         </Button>
       </form>
-      <p className="mt-4 text-center text-sm text-slate-500">
+      <p className="auth-alt">
+        <button
+          type="button"
+          className="text-btn"
+          onClick={() => {
+            setEmail(DEMO_EMAIL)
+            setPassword(DEMO_PASSWORD)
+            setError("")
+          }}
+        >
+          Use the demo account
+        </button>
         No account?{" "}
-        <Link to="/register" className="font-medium text-emerald-600 hover:underline">
+        <Link to="/register" >
           Register
         </Link>
       </p>
