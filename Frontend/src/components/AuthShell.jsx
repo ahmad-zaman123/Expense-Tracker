@@ -10,12 +10,12 @@ function AuthShell({ title, subtitle, children }) {
           </svg>
           Back to home
         </Link>
-        <span className="brand" style={{ color: "var(--ink)" }}>
+        <Link to="/" className="brand" style={{ color: "var(--ink)" }} aria-label="Expense Tracker home">
           <span className="brand-mark" aria-hidden="true">
             ₨
           </span>
           Expense Tracker
-        </span>
+        </Link>
         <h1>{title}</h1>
         {subtitle ? <p className="sub">{subtitle}</p> : null}
         {children}
