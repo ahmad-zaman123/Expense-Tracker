@@ -11,13 +11,6 @@ const NAV_ITEMS = [
   { to: "/app/recurring", label: "Recurring" },
 ]
 
-function navClass({ isActive }) {
-  return (
-    "rounded-md px-3 py-2 text-sm font-medium " +
-    (isActive ? "bg-emerald-50 text-emerald-700" : "text-slate-600 hover:text-slate-900")
-  )
-}
-
 function Layout() {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
@@ -28,36 +21,40 @@ function Layout() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600 text-sm font-bold text-white">
+    <div>
+      <header className="band">
+        <div className="band-inner">
+          <span className="brand">
+            <span className="brand-mark" aria-hidden="true">
               ₨
-            </div>
-            <span className="font-semibold text-slate-900">Expense Tracker</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-slate-500">{user?.email}</span>
-            <button
-              onClick={handleSignOut}
-              className="text-sm font-medium text-slate-600 hover:text-slate-900"
-            >
+            </span>
+            Expense Tracker
+          </span>
+          <div className="band-right">
+            <span className="who">{user?.email}</span>
+            <button onClick={handleSignOut} className="band-btn">
               Sign out
             </button>
           </div>
         </div>
-        <nav className="mx-auto flex max-w-5xl gap-1 px-3 pb-2">
+        <nav className="tabs" aria-label="Sections">
           {NAV_ITEMS.map((item) => (
-            <NavLink key={item.to} to={item.to} end={item.end} className={navClass}>
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.end}
+              className={({ isActive }) => "tab" + (isActive ? " is-active" : "")}
+            >
               {item.label}
             </NavLink>
           ))}
         </nav>
       </header>
-      <main className="mx-auto max-w-5xl px-4 py-8">
-        <Outlet />
-      </main>
+      <div className="page-wrap">
+        <main className="page">
+          <Outlet />
+        </main>
+      </div>
     </div>
   )
 }

@@ -1,9 +1,19 @@
 import { useEffect, useState } from "react"
 
 import { dismissRecurring, listRecurring } from "../api/recurring"
-import { Alert, Card } from "../components/ui.jsx"
+import { Alert, PageHead } from "../components/ui.jsx"
 import { formatError } from "../utils/errors"
 import { formatMoney } from "../utils/format"
+
+// How far away the next expected charge is, in words.
+function dueState(iso) {
+  const days = Math.round((new Date(iso + "T00:00:00") - new Date().setHours(0, 0, 0, 0)) / 86400000)
+  if (Number.isNaN(days)) return { level: "ok", text: "" }
+  if (days < 0) return { level: "near", text: "Expected " + Math.abs(days) + " day" + (days === -1 ? "" : "s") + " ago" }
+  if (days === 0) return { level: "near", text: "Due today" }
+  if (days <= 7) return { level: "near", text: "Due in " + days + " day" + (days === 1 ? "" : "s") }
+  return { level: "ok", text: "In " + days + " days" }
+}
 
 function Recurring() {
   const [rules, setRules] = useState([])
@@ -37,50 +47,56 @@ function Recurring() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Recurring</h1>
-        <p className="mt-1 text-slate-500">
-          Subscriptions and repeating charges detected from your transactions. Detection
-          runs nightly.
-        </p>
-      </div>
+    <div className="stack">
+      <PageHead title="Recurring">
+        Subscriptions and repeating charges detected from your transactions. Detection runs nightly.
+      </PageHead>
 
       <Alert>{error}</Alert>
 
       {loading ? (
-        <p className="text-slate-500">Loading…</p>
+        <p className="note">Loading the ledger…</p>
       ) : rules.length === 0 ? (
-        <Card>
-          <p className="text-slate-500">
-            No recurring charges detected yet. Once a payee appears about monthly across a
-            few transactions, it shows up here.
-          </p>
-        </Card>
+        <p className="empty-row">
+          No recurring charges detected yet. Once a payee appears about monthly across a few
+          transactions, it shows up here.
+        </p>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {rules.map((rule) => (
-            <Card key={rule.id}>
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="font-medium text-slate-900">{rule.payee}</p>
-                  <p className="mt-1 text-sm text-slate-500">
-                    ≈ {formatMoney(rule.avg_amount)} every {rule.cadence_days} days
-                  </p>
-                  <p className="mt-1 text-xs text-slate-400">
-                    Next expected {rule.next_expected_at} · {rule.sample_count} charges ·{" "}
-                    {Math.round(Number(rule.confidence) * 100)}% confidence
-                  </p>
-                </div>
-                <button
-                  onClick={() => handleDismiss(rule.id)}
-                  className="text-sm text-slate-400 hover:text-red-600"
-                >
-                  Dismiss
-                </button>
-              </div>
-            </Card>
-          ))}
+        <div className="table-wrap">
+          <table className="ledger">
+            <thead>
+              <tr>
+                <th>Payee</th>
+                <th className="num">About</th>
+                <th>Every</th>
+                <th>Next due</th>
+                <th className="num">Confidence</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {rules.map((rule) => (
+                <tr key={rule.id}>
+                  <td>
+                    {rule.payee}
+                    <span className="sub">{rule.sample_count} charges seen</span>
+                  </td>
+                  <td className="num out">{formatMoney(rule.avg_amount)}</td>
+                  <td>{rule.cadence_days} days</td>
+                  <td>
+                    <span className="day">{rule.next_expected_at}</span>
+                    <span className={"sub state " + (dueState(rule.next_expected_at).level)}>
+                      {dueState(rule.next_expected_at).text}
+                    </span>
+                  </td>
+                  <td className="num">{Math.round(Number(rule.confidence) * 100)}%</td>
+                  <td className="act">
+                    <DeleteButton label="Dismiss" what="charge" onConfirm={() => handleDismiss(rule.id)} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

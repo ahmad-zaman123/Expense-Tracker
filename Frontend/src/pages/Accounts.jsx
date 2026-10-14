@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 
 import { createAccount, deleteAccount, listAccounts } from "../api/finance"
-import { Alert, Button, Card, TextField } from "../components/ui.jsx"
+import { Alert, Button, DeleteButton, PageHead, TextField } from "../components/ui.jsx"
 import { formatError } from "../utils/errors"
 import { formatMoney } from "../utils/format"
 
@@ -55,71 +55,75 @@ function Accounts() {
     }
   }
 
+  const total = accounts.reduce((sum, a) => sum + Number(a.current_balance || 0), 0)
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Accounts</h1>
-        <p className="mt-1 text-slate-500">Your cash, bank, and wallet balances.</p>
-      </div>
+    <div className="stack">
+      <PageHead title="Accounts">Your cash, bank and wallet balances. Balances are worked out from the entries.</PageHead>
 
       <Alert>{error}</Alert>
 
-      <Card>
-        <form onSubmit={handleAdd} className="flex flex-wrap items-end gap-3">
-          <div className="min-w-[180px] flex-1">
-            <TextField
-              label="Name"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              placeholder="e.g. HBL Savings"
-              required
-            />
-          </div>
-          <div className="w-40">
-            <TextField
-              label="Opening balance"
-              type="number"
-              step="0.01"
-              value={openingBalance}
-              onChange={(event) => setOpeningBalance(event.target.value)}
-              placeholder="0.00"
-            />
-          </div>
+      <form onSubmit={handleAdd} className="entry" aria-label="Add an account">
+        <TextField
+          label="Name"
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          placeholder="e.g. HBL Savings"
+          required
+        />
+        <TextField
+          label="Opening balance"
+          type="number"
+          step="0.01"
+          value={openingBalance}
+          onChange={(event) => setOpeningBalance(event.target.value)}
+          placeholder="0.00"
+        />
+        <div>
           <Button type="submit" disabled={submitting}>
             {submitting ? "Adding…" : "Add account"}
           </Button>
-        </form>
-      </Card>
+        </div>
+      </form>
 
       {loading ? (
-        <p className="text-slate-500">Loading…</p>
+        <p className="note">Loading the ledger…</p>
       ) : accounts.length === 0 ? (
-        <Card>
-          <p className="text-slate-500">No accounts yet. Add your first one above.</p>
-        </Card>
+        <p className="empty-row">No accounts yet. Add your first one above and give it an opening balance.</p>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {accounts.map((account) => (
-            <Card key={account.id}>
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="font-medium text-slate-900">{account.name}</p>
-                  <p className="mt-1 text-2xl font-semibold text-slate-900">
+        <div className="table-wrap">
+          <table className="ledger">
+            <thead>
+              <tr>
+                <th>Account</th>
+                <th className="num">Opening</th>
+                <th className="num">Balance</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {accounts.map((account) => (
+                <tr key={account.id}>
+                  <td>{account.name}</td>
+                  <td className="num">{formatMoney(account.opening_balance)}</td>
+                  <td className="num" style={{ fontWeight: 700 }}>
                     {formatMoney(account.current_balance)}
-                  </p>
-                  <p className="mt-1 text-xs text-slate-400">
-                    Opening {formatMoney(account.opening_balance)}
-                  </p>
-                </div>
-                <button
-                  onClick={() => handleDelete(account.id)}
-                  className="text-sm text-slate-400 hover:text-red-600"
-                >
-                  Delete
-                </button>
-              </div>
-            </Card>
-          ))}
+                  </td>
+                  <td className="act">
+                    <DeleteButton what="account" onConfirm={() => handleDelete(account.id)} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td>Total</td>
+                <td />
+                <td className="num">{formatMoney(total)}</td>
+                <td />
+              </tr>
+            </tfoot>
+          </table>
         </div>
       )}
     </div>

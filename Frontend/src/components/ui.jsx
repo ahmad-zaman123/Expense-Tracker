@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useId, useState } from "react"
 
 function EyeIcon({ off }) {
   return (
@@ -11,74 +11,56 @@ function EyeIcon({ off }) {
         strokeLinejoin="round"
       />
       <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.6" />
-      {off && (
-        <path d="M4 4l16 16" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-      )}
+      {off && <path d="M4 4l16 16" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />}
     </svg>
   )
 }
 
 export function TextField({ label, type = "text", value, onChange, ...props }) {
   const [reveal, setReveal] = useState(false)
+  const id = useId()
   const isPassword = type === "password"
   const inputType = isPassword && reveal ? "text" : type
   return (
-    <label className="block">
-      <span className="mb-1 block text-sm font-medium text-slate-700">{label}</span>
-      <div className="relative">
-        <input
-          type={inputType}
-          value={value}
-          onChange={onChange}
-          className={
-            "w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 outline-none " +
-            "focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200" +
-            (isPassword ? " pr-11" : "")
-          }
-          {...props}
-        />
+    <div className="field">
+      <label className="field-label" htmlFor={id}>
+        {label}
+      </label>
+      <div className={isPassword ? "input-wrap" : undefined}>
+        <input id={id} className="input" type={inputType} value={value} onChange={onChange} {...props} />
         {isPassword && (
           <button
             type="button"
+            className="reveal"
             onClick={() => setReveal((visible) => !visible)}
             aria-label={reveal ? "Hide password" : "Show password"}
             title={reveal ? "Hide password" : "Show password"}
-            className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-400 hover:text-emerald-600"
           >
             <EyeIcon off={reveal} />
           </button>
         )}
       </div>
-    </label>
+    </div>
   )
 }
 
 export function SelectField({ label, value, onChange, children, ...props }) {
+  const id = useId()
   return (
-    <label className="block">
-      <span className="mb-1 block text-sm font-medium text-slate-700">{label}</span>
-      <select
-        value={value}
-        onChange={onChange}
-        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
-        {...props}
-      >
+    <div className="field">
+      <label className="field-label" htmlFor={id}>
+        {label}
+      </label>
+      <select id={id} className="select" value={value} onChange={onChange} {...props}>
         {children}
       </select>
-    </label>
+    </div>
   )
 }
 
 export function Button({ children, className = "", ...props }) {
   return (
-    <button
-      className={
-        "rounded-lg bg-emerald-600 px-4 py-2 font-medium text-white transition " +
-        "hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60 " +
-        className
-      }
-      {...props}
-    >
+    <button className={"btn " + className} {...props}>
       {children}
     </button>
   )
@@ -88,13 +70,46 @@ export function Alert({ children }) {
   if (!children) {
     return null
   }
-  return <div className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{children}</div>
-}
-
-export function Card({ children, className = "" }) {
   return (
-    <div className={"rounded-xl border border-slate-200 bg-white p-5 shadow-sm " + className}>
+    <div className="alert" role="alert">
       {children}
     </div>
   )
+}
+
+/** A heading for a ledger page. */
+export function PageHead({ title, children }) {
+  return (
+    <div className="page-head">
+      <h1>{title}</h1>
+      {children ? <p>{children}</p> : null}
+    </div>
+  )
+}
+
+/** A destructive action in two steps, so a stray click never removes a record. */
+export function DeleteButton({ onConfirm, what = "entry", label = "Delete", confirmLabel }) {
+  const [asking, setAsking] = useState(false)
+  if (!asking) {
+    return (
+      <button className="text-btn" onClick={() => setAsking(true)}>
+        {label}
+      </button>
+    )
+  }
+  return (
+    <span className="confirm">
+      <button className="text-btn danger" onClick={onConfirm}>
+        {confirmLabel || label + " this " + what}
+      </button>
+      <button className="text-btn" onClick={() => setAsking(false)}>
+        Cancel
+      </button>
+    </span>
+  )
+}
+
+/** Kept for compatibility: a plain section. */
+export function Card({ children, className = "" }) {
+  return <section className={className}>{children}</section>
 }
