@@ -24,11 +24,9 @@
   <a href="#-deployment--ci">Deployment</a>
 </p>
 
-<!-- Hero screenshot: add docs/screenshots/dashboard.png (≈1600px wide), then uncomment:
 <p align="center">
   <img src="docs/screenshots/dashboard.png" alt="Expense Tracker dashboard" width="860" />
 </p>
--->
 
 ---
 
