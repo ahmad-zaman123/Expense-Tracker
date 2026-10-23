@@ -161,3 +161,7 @@ CORS_ALLOWED_ORIGINS = env.list(
     "CORS_ALLOWED_ORIGINS",
     default=["http://localhost:5173", "http://127.0.0.1:5173"],
 )
+
+
+# Google sign-in (optional). The OAuth client id from Google Cloud Console; empty disables the endpoint.
+GOOGLE_CLIENT_ID = env("GOOGLE_CLIENT_ID", default="")

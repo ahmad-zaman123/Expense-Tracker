@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react"
 
-import { fetchMe, obtainToken, registerUser } from "../api/auth"
+import { fetchMe, obtainToken, obtainTokenWithGoogle, registerUser } from "../api/auth"
 import { clearTokens, getAccessToken } from "../api/client"
 
 const AuthContext = createContext(null)
@@ -38,6 +38,13 @@ export function AuthProvider({ children }) {
     return login({ email, password })
   }
 
+  async function loginWithGoogle(credential) {
+    await obtainTokenWithGoogle(credential)
+    const me = await fetchMe()
+    setUser(me)
+    return me
+  }
+
   function signOut() {
     clearTokens()
     setUser(null)
@@ -48,6 +55,7 @@ export function AuthProvider({ children }) {
     loading,
     isAuthenticated: Boolean(user),
     login,
+    loginWithGoogle,
     register,
     signOut,
   }

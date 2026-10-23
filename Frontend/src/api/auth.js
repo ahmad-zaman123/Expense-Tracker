@@ -18,6 +18,17 @@ export async function obtainToken({ email, password }) {
   return data
 }
 
+/** Exchange a Google ID token (from the Google button) for our JWT pair; creates the account on first use. */
+export async function obtainTokenWithGoogle(credential) {
+  const data = await apiRequest("/auth/google/", {
+    method: "POST",
+    auth: false,
+    body: { credential },
+  })
+  setTokens({ access: data.access, refresh: data.refresh })
+  return data
+}
+
 export async function fetchMe() {
   return apiRequest("/auth/me/")
 }

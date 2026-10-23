@@ -1,15 +1,16 @@
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 
 import { useAuth } from "../auth/AuthContext"
 import AuthShell from "../components/AuthShell.jsx"
+import GoogleButton from "../components/GoogleButton.jsx"
 import { Alert, Button, TextField } from "../components/ui.jsx"
 import { formatError } from "../utils/errors"
 import { useDocumentTitle } from "../utils/useDocumentTitle"
 
 function Register() {
   useDocumentTitle("Create account")
-  const { register } = useAuth()
+  const { register, loginWithGoogle } = useAuth()
   const navigate = useNavigate()
   const [fullName, setFullName] = useState("")
   const [email, setEmail] = useState("")
@@ -31,9 +32,26 @@ function Register() {
     }
   }
 
+  const handleGoogle = useCallback(
+    async (credential) => {
+      setError("")
+      setSubmitting(true)
+      try {
+        await loginWithGoogle(credential)
+        navigate("/app")
+      } catch (err) {
+        setError(formatError(err))
+      } finally {
+        setSubmitting(false)
+      }
+    },
+    [loginWithGoogle, navigate],
+  )
+
   return (
     <AuthShell title="Open a new ledger" subtitle="Start tracking your finances.">
       <form onSubmit={handleSubmit} className="auth-form" style={{ display: "grid", gap: "0.9rem" }}>
+        <GoogleButton onCredential={handleGoogle} onError={setError} text="signup_with" />
         <Alert>{error}</Alert>
         <TextField
           label="Full name"

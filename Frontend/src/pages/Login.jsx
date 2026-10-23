@@ -1,8 +1,9 @@
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 
 import { useAuth } from "../auth/AuthContext"
 import AuthShell from "../components/AuthShell.jsx"
+import GoogleButton from "../components/GoogleButton.jsx"
 import { Alert, Button, TextField } from "../components/ui.jsx"
 import { formatError } from "../utils/errors"
 import { useDocumentTitle } from "../utils/useDocumentTitle"
@@ -12,7 +13,7 @@ const DEMO_PASSWORD = "demo1234"
 
 function Login() {
   useDocumentTitle("Sign in")
-  const { login } = useAuth()
+  const { login, loginWithGoogle } = useAuth()
   const navigate = useNavigate()
   const { state } = useLocation()
   const [email, setEmail] = useState(state?.demo ? DEMO_EMAIL : "")
@@ -34,9 +35,26 @@ function Login() {
     }
   }
 
+  const handleGoogle = useCallback(
+    async (credential) => {
+      setError("")
+      setSubmitting(true)
+      try {
+        await loginWithGoogle(credential)
+        navigate("/app")
+      } catch (err) {
+        setError(formatError(err))
+      } finally {
+        setSubmitting(false)
+      }
+    },
+    [loginWithGoogle, navigate],
+  )
+
   return (
     <AuthShell title="Sign in to your ledger" subtitle="Welcome back.">
       <form onSubmit={handleSubmit} className="auth-form" style={{ display: "grid", gap: "0.9rem" }}>
+        <GoogleButton onCredential={handleGoogle} onError={setError} text="continue_with" />
         <Alert>{error}</Alert>
         <TextField
           label="Email"

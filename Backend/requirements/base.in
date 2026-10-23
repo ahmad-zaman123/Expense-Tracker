@@ -7,3 +7,5 @@ django-filter
 drf-spectacular
 psycopg[binary]
 whitenoise
+google-auth
+requests

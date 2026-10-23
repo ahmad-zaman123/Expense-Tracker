@@ -111,8 +111,23 @@ npm run dev
 | `ALLOWED_HOSTS` | no | Defaults to `*` in `.env.example`. |
 | `CORS_ALLOWED_ORIGINS` | no | Comma-separated frontend origins. Defaults to the local Vite dev server. |
 | `CSRF_TRUSTED_ORIGINS` | prod | Comma-separated, used by `config.settings.prod`. |
+| `GOOGLE_CLIENT_ID` | no | Turns on "Continue with Google" on the sign-in page. See **Google sign-in** below. |
 
-Frontend: `VITE_API_URL` is the only variable, and points at the backend's `/api`.
+Frontend: `VITE_API_URL` points at the backend's `/api`; `VITE_GOOGLE_CLIENT_ID` is the same Google client id, only needed for the Google button.
+
+</details>
+
+<details>
+<summary><b>🔑 Google sign-in</b> (optional, free)</summary>
+<br/>
+
+Adds a **Continue with Google** button to the sign-in page. First-time Google users get an account created from their Google email and name; existing accounts with the same email just sign in. Password sign-in keeps working as before.
+
+1. In [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials) create an **OAuth client ID** of type **Web application**. If asked, set up the consent screen first (External, app name, your email; no extra scopes).
+2. Under **Authorized JavaScript origins** add your frontend origins, for example `http://localhost:5173` and `https://<your-frontend>.vercel.app`. No redirect URI is needed.
+3. Put the client ID in `GOOGLE_CLIENT_ID` (backend) **and** `VITE_GOOGLE_CLIENT_ID` (frontend) and redeploy both. There is no client secret in this flow: the backend verifies the Google ID token with Google's public keys and then issues the usual JWT pair from `POST /api/auth/google/`.
+
+Leave both variables empty and the button is hidden.
 
 </details>
 
@@ -172,7 +187,7 @@ Interactive docs at **`/api/docs/`** (Swagger), JSON schema at `/api/schema/`. E
 
 | Area | Endpoints |
 |---|---|
-| **Auth** | `POST /api/auth/register/`, `/auth/token/`, `/auth/token/refresh/`, `GET /auth/me/` |
+| **Auth** | `POST /api/auth/register/`, `/auth/token/`, `/auth/token/refresh/`, `/auth/google/`, `GET /auth/me/` |
 | **Finance** | `/api/accounts/`, `/categories/`, `/budgets/`, `/transactions/`, `/transfers/` (list, create, detail) |
 | **Import** | `POST /api/transactions/import/` |
 | **Recurring** | `GET /api/recurring/`, `POST /api/recurring/<id>/dismiss/` |
