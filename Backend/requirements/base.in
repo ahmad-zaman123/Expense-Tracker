@@ -7,5 +7,6 @@ django-filter
 drf-spectacular
 psycopg[binary]
 whitenoise
-google-auth
+# <2.41 keeps google-auth on pure-Python crypto (rsa) instead of pulling cryptography/cffi wheels.
+google-auth<2.41
 requests

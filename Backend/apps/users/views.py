@@ -1,7 +1,5 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from google.auth.transport import requests as google_requests
-from google.oauth2 import id_token as google_id_token
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -48,6 +46,16 @@ class GoogleAuthAPIView(APIView):
         if not credential or not isinstance(credential, str):
             return Response(
                 {"detail": "Missing Google credential."}, status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            # Imported here, not at module load, so a problem with the Google library can
+            # never take the rest of the API down with it.
+            from google.auth.transport import requests as google_requests
+            from google.oauth2 import id_token as google_id_token
+        except Exception as exc:  # noqa: BLE001 - report whatever failed to load
+            return Response(
+                {"detail": f"Google sign-in is unavailable: {type(exc).__name__}: {exc}"},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
         try:
             claims = google_id_token.verify_oauth2_token(
