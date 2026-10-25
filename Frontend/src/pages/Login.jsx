@@ -26,6 +26,7 @@ function Login() {
   const [password, setPassword] = useState(state?.demo ? DEMO_PASSWORD : "")
   const [error, setError] = useState("")
   const [submitting, setSubmitting] = useState(false)
+  const [googleBusy, setGoogleBusy] = useState(false)
 
   async function handleSubmit(event) {
     event.preventDefault()
@@ -45,6 +46,7 @@ function Login() {
     async (credential) => {
       setError("")
       setSubmitting(true)
+      setGoogleBusy(true)
       try {
         await loginWithGoogle(credential)
         navigate(afterLogin(search, "/app"))
@@ -52,6 +54,7 @@ function Login() {
         setError(formatError(err))
       } finally {
         setSubmitting(false)
+        setGoogleBusy(false)
       }
     },
     [loginWithGoogle, navigate],
@@ -60,7 +63,7 @@ function Login() {
   return (
     <AuthShell title="Sign in to your ledger" subtitle="Welcome back.">
       <form onSubmit={handleSubmit} className="auth-form" style={{ display: "grid", gap: "0.9rem" }}>
-        <GoogleButton onCredential={handleGoogle} onError={setError} />
+        <GoogleButton onCredential={handleGoogle} onError={setError} busy={googleBusy} />
         <Alert>{error}</Alert>
         <TextField
           label="Email"

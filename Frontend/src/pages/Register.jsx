@@ -17,6 +17,7 @@ function Register() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [submitting, setSubmitting] = useState(false)
+  const [googleBusy, setGoogleBusy] = useState(false)
 
   async function handleSubmit(event) {
     event.preventDefault()
@@ -36,6 +37,7 @@ function Register() {
     async (credential) => {
       setError("")
       setSubmitting(true)
+      setGoogleBusy(true)
       try {
         await loginWithGoogle(credential)
         navigate("/app")
@@ -43,6 +45,7 @@ function Register() {
         setError(formatError(err))
       } finally {
         setSubmitting(false)
+        setGoogleBusy(false)
       }
     },
     [loginWithGoogle, navigate],
@@ -51,7 +54,7 @@ function Register() {
   return (
     <AuthShell title="Open a new ledger" subtitle="Start tracking your finances.">
       <form onSubmit={handleSubmit} className="auth-form" style={{ display: "grid", gap: "0.9rem" }}>
-        <GoogleButton onCredential={handleGoogle} onError={setError} />
+        <GoogleButton onCredential={handleGoogle} onError={setError} busy={googleBusy} />
         <Alert>{error}</Alert>
         <TextField
           label="Full name"
