@@ -42,6 +42,22 @@ function Login() {
     }
   }
 
+  /** One click: sign straight in as the shared demo user. */
+  async function useDemo() {
+    setEmail(DEMO_EMAIL)
+    setPassword(DEMO_PASSWORD)
+    setError("")
+    setSubmitting(true)
+    try {
+      await login({ email: DEMO_EMAIL, password: DEMO_PASSWORD })
+      navigate(afterLogin(search, "/app"))
+    } catch (err) {
+      setError(formatError(err))
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   const handleGoogle = useCallback(
     async (credential) => {
       setError("")
@@ -86,15 +102,7 @@ function Login() {
         </Button>
       </form>
       <p className="auth-alt">
-        <button
-          type="button"
-          className="text-btn"
-          onClick={() => {
-            setEmail(DEMO_EMAIL)
-            setPassword(DEMO_PASSWORD)
-            setError("")
-          }}
-        >
+        <button type="button" className="text-btn" onClick={useDemo} disabled={submitting}>
           Use the demo account
         </button>
         No account?{" "}
