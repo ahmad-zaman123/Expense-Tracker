@@ -21,3 +21,10 @@ export function recentMonthsRange(count) {
     to: now.getFullYear() + "-" + pad(now.getMonth() + 1) + "-" + pad(lastDay),
   }
 }
+
+/** "2026-10" -> "October 2026", for anywhere a month is shown to a person. */
+export function formatMonth(yearMonth) {
+  const [year, month] = String(yearMonth || "").split("-").map(Number)
+  if (!year || !month) return yearMonth || ""
+  return new Date(year, month - 1, 1).toLocaleDateString("en-GB", { month: "long", year: "numeric" })
+}

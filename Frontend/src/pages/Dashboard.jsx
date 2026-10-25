@@ -4,7 +4,7 @@ import { listAccounts } from "../api/finance"
 import { cashflow, monthlyReport } from "../api/reports"
 import CashflowChart from "../components/CashflowChart.jsx"
 import { PageHead, TextField , TableWrap } from "../components/ui.jsx"
-import { currentMonth, recentMonthsRange } from "../utils/date"
+import { currentMonth, formatMonth, recentMonthsRange } from "../utils/date"
 import { formatMoney } from "../utils/format"
 import { useDocumentTitle } from "../utils/useDocumentTitle"
 
@@ -81,15 +81,15 @@ function Dashboard() {
 
       {autoMonth ? (
         <p className="note" role="status">
-          Showing {month}, the latest month with entries.
+          Showing {formatMonth(month)}, the latest month with entries.
         </p>
       ) : null}
 
-      <section aria-label={"Totals for " + month}>
+      <section aria-label={"Totals for " + formatMonth(month)}>
         <div className="totals">
-          <Total label="In" value={monthly ? formatMoney(monthly.income) : "…"} hint={month} />
-          <Total label="Out" value={monthly ? formatMoney(monthly.expense) : "…"} hint={month} />
-          <Total label="Net" value={monthly ? formatMoney(monthly.net) : "…"} hint={month} />
+          <Total label="In" value={monthly ? formatMoney(monthly.income) : "…"} hint={formatMonth(month)} />
+          <Total label="Out" value={monthly ? formatMoney(monthly.expense) : "…"} hint={formatMonth(month)} />
+          <Total label="Net" value={monthly ? formatMoney(monthly.net) : "…"} hint={formatMonth(month)} />
           <Total
             label="Total balance"
             value={formatMoney(totalBalance)}
