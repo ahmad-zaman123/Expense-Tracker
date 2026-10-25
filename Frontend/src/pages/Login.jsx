@@ -11,11 +11,17 @@ import { useDocumentTitle } from "../utils/useDocumentTitle"
 const DEMO_EMAIL = "demo@expense-tracker.app"
 const DEMO_PASSWORD = "demo1234"
 
+/** Where to go after signing in: the local path the session expired on, or the app's home. */
+function afterLogin(search, fallback) {
+  const next = new URLSearchParams(search).get("next") || ""
+  return next.startsWith("/") && !next.startsWith("//") ? next : fallback
+}
+
 function Login() {
   useDocumentTitle("Sign in")
   const { login, loginWithGoogle } = useAuth()
   const navigate = useNavigate()
-  const { state } = useLocation()
+  const { state, search } = useLocation()
   const [email, setEmail] = useState(state?.demo ? DEMO_EMAIL : "")
   const [password, setPassword] = useState(state?.demo ? DEMO_PASSWORD : "")
   const [error, setError] = useState("")
@@ -27,7 +33,7 @@ function Login() {
     setSubmitting(true)
     try {
       await login({ email, password })
-      navigate("/app")
+      navigate(afterLogin(search, "/app"))
     } catch (err) {
       setError(formatError(err))
     } finally {
@@ -41,7 +47,7 @@ function Login() {
       setSubmitting(true)
       try {
         await loginWithGoogle(credential)
-        navigate("/app")
+        navigate(afterLogin(search, "/app"))
       } catch (err) {
         setError(formatError(err))
       } finally {
