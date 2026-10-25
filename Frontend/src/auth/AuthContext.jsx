@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react"
 
-import { fetchMe, obtainToken, obtainTokenWithGoogle, registerUser } from "../api/auth"
+import { changePassword as changePasswordRequest, fetchMe, obtainToken, obtainTokenWithGoogle, registerUser } from "../api/auth"
 import { clearTokens, getAccessToken } from "../api/client"
 
 const AuthContext = createContext(null)
@@ -45,6 +45,11 @@ export function AuthProvider({ children }) {
     return me
   }
 
+  async function changePassword(payload) {
+    await changePasswordRequest(payload)
+    setUser(await fetchMe())
+  }
+
   function signOut() {
     clearTokens()
     setUser(null)
@@ -57,6 +62,7 @@ export function AuthProvider({ children }) {
     login,
     loginWithGoogle,
     register,
+    changePassword,
     signOut,
   }
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

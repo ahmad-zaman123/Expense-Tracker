@@ -1,6 +1,7 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom"
 
 import { useAuth } from "../auth/AuthContext"
+import ProfileMenu from "./ProfileMenu.jsx"
 
 const NAV_ITEMS = [
   { to: "/app", label: "Dashboard", end: true },
@@ -12,7 +13,7 @@ const NAV_ITEMS = [
 ]
 
 function Layout() {
-  const { user, signOut } = useAuth()
+  const { user, signOut, changePassword } = useAuth()
   const navigate = useNavigate()
 
   function handleSignOut() {
@@ -31,10 +32,7 @@ function Layout() {
             Expense Tracker
           </span>
           <div className="band-right">
-            <span className="who">{user?.email}</span>
-            <button onClick={handleSignOut} className="band-btn">
-              Sign out
-            </button>
+            <ProfileMenu user={user} onSignOut={handleSignOut} changePassword={changePassword} />
           </div>
         </div>
         <nav className="tabs" aria-label="Sections">

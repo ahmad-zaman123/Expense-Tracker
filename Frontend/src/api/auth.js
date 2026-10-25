@@ -33,6 +33,10 @@ export async function fetchMe() {
   return apiRequest("/auth/me/")
 }
 
+export async function changePassword(payload) {
+  return apiRequest("/auth/password/", { method: "POST", body: payload })
+}
+
 export function logout() {
   clearTokens()
 }

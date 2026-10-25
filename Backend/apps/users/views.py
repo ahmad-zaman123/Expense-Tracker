@@ -1,12 +1,12 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from rest_framework import generics, status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.users.serializers import RegisterSerializer, UserSerializer
+from apps.users.serializers import ChangePasswordSerializer, RegisterSerializer, UserSerializer
 
 User = get_user_model()
 
@@ -88,3 +88,15 @@ class GoogleAuthAPIView(APIView):
         return Response(
             {"access": str(refresh.access_token), "refresh": str(refresh), "created": created}
         )
+
+
+class ChangePasswordAPIView(APIView):
+    """Change (or, for Google sign-in accounts, first set) the signed-in user's password."""
+
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = ChangePasswordSerializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"detail": "Password changed."})
