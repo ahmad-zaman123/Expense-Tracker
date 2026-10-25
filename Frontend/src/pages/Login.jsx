@@ -54,7 +54,7 @@ function Login() {
   return (
     <AuthShell title="Sign in to your ledger" subtitle="Welcome back.">
       <form onSubmit={handleSubmit} className="auth-form" style={{ display: "grid", gap: "0.9rem" }}>
-        <GoogleButton onCredential={handleGoogle} onError={setError} text="continue_with" />
+        <GoogleButton onCredential={handleGoogle} onError={setError} />
         <Alert>{error}</Alert>
         <TextField
           label="Email"

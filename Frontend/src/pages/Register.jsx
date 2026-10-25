@@ -51,7 +51,7 @@ function Register() {
   return (
     <AuthShell title="Open a new ledger" subtitle="Start tracking your finances.">
       <form onSubmit={handleSubmit} className="auth-form" style={{ display: "grid", gap: "0.9rem" }}>
-        <GoogleButton onCredential={handleGoogle} onError={setError} text="signup_with" />
+        <GoogleButton onCredential={handleGoogle} onError={setError} />
         <Alert>{error}</Alert>
         <TextField
           label="Full name"
