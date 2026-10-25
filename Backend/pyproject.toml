@@ -13,6 +13,9 @@ dependencies = [
     "drf-spectacular",
     "psycopg[binary]",
     "whitenoise",
+    # Google sign-in. <2.41 keeps google-auth on pure-Python crypto (rsa) instead of cryptography/cffi wheels.
+    "google-auth<2.41",
+    "requests",
 ]
 
 # The app is not itself an installable package ? uv only manages its
