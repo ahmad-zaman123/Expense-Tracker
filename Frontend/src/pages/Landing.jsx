@@ -1,6 +1,7 @@
 import { Link, Navigate } from "react-router-dom"
 
 import { useAuth } from "../auth/AuthContext"
+import ThemeToggle from "../components/ThemeToggle.jsx"
 
 // A synthetic example page, labelled as such below.
 const SPECIMEN = [
@@ -70,9 +71,12 @@ function Landing() {
             </span>
             Expense Tracker
           </span>
-          <Link to="/login" className="band-btn" style={{ textDecoration: "none" }}>
-            Sign in
-          </Link>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+            <Link to="/login" className="band-btn" style={{ textDecoration: "none" }}>
+              Sign in
+            </Link>
+            <ThemeToggle className="on-band" />
+          </div>
         </header>
       </div>
 

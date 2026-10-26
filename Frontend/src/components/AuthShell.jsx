@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom"
+import ThemeToggle from "./ThemeToggle.jsx"
 
 function AuthShell({ title, subtitle, children }) {
   return (
     <div className="auth">
+      <ThemeToggle className="floating" />
       <div className="auth-card">
         <Link to="/" className="back-link">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
