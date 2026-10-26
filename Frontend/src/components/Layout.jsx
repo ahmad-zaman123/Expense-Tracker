@@ -2,6 +2,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom"
 
 import { useAuth } from "../auth/AuthContext"
 import ProfileMenu from "./ProfileMenu.jsx"
+import ThemeToggle from "./ThemeToggle.jsx"
 
 const NAV_ITEMS = [
   { to: "/app", label: "Dashboard", end: true },
@@ -32,6 +33,7 @@ function Layout() {
             Expense Tracker
           </span>
           <div className="band-right">
+            <ThemeToggle className="on-band" />
             <ProfileMenu user={user} onSignOut={handleSignOut} changePassword={changePassword} />
           </div>
         </div>

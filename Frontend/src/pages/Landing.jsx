@@ -72,10 +72,10 @@ function Landing() {
             Expense Tracker
           </span>
           <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+            <ThemeToggle className="on-band" />
             <Link to="/login" className="band-btn" style={{ textDecoration: "none" }}>
               Sign in
             </Link>
-            <ThemeToggle className="on-band" />
           </div>
         </header>
       </div>
