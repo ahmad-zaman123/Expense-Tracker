@@ -33,8 +33,8 @@ function Layout() {
             Expense Tracker
           </span>
           <div className="band-right">
-            <ThemeToggle className="on-band" />
             <ProfileMenu user={user} onSignOut={handleSignOut} changePassword={changePassword} />
+            <ThemeToggle className="on-band" />
           </div>
         </div>
         <nav className="tabs" aria-label="Sections">
