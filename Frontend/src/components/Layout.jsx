@@ -1,6 +1,9 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom"
 
 import { useAuth } from "../auth/AuthContext"
+import { markSignedOut } from "../auth/fingerprint"
+import FingerprintMenuItem from "./FingerprintMenuItem.jsx"
+import FingerprintOffer from "./FingerprintOffer.jsx"
 import ProfileMenu from "./ProfileMenu.jsx"
 import ThemeToggle from "./ThemeToggle.jsx"
 
@@ -18,6 +21,7 @@ function Layout() {
   const navigate = useNavigate()
 
   function handleSignOut() {
+    markSignedOut()
     signOut()
     navigate("/login")
   }
@@ -33,7 +37,9 @@ function Layout() {
             Expense Tracker
           </span>
           <div className="band-right">
-            <ProfileMenu user={user} onSignOut={handleSignOut} changePassword={changePassword} />
+            <ProfileMenu user={user} onSignOut={handleSignOut} changePassword={changePassword}>
+              <FingerprintMenuItem user={user} />
+            </ProfileMenu>
             <ThemeToggle className="on-band" />
           </div>
         </div>
@@ -52,6 +58,7 @@ function Layout() {
       </header>
       <div className="page-wrap">
         <main className="page">
+          <FingerprintOffer user={user} />
           <Outlet />
         </main>
       </div>

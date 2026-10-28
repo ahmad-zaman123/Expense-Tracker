@@ -1,7 +1,7 @@
 // Makes the app installable and lets its shell open without a connection.
 // Only this site's own files are handled. API calls go to another origin and are never cached,
 // so no financial data is ever stored by the service worker.
-const CACHE = 'et-shell-v1';
+const CACHE = 'et-shell-v2';
 const SHELL = ['/', '/favicon.svg', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png'];
 
 self.addEventListener('install', e => {

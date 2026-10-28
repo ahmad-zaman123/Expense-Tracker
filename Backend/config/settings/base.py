@@ -137,6 +137,8 @@ REST_FRAMEWORK = {
         "rest_framework.filters.OrderingFilter",
     ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    # Fingerprint sign-in endpoints only; everything else is unthrottled as before.
+    "DEFAULT_THROTTLE_RATES": {"passkey": "30/min"},
 }
 
 SIMPLE_JWT = {

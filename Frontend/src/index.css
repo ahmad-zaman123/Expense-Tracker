@@ -318,3 +318,9 @@ table.ledger { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
 .theme-toggle:hover { background: var(--paper); }
 .theme-toggle.on-band { border-color: rgba(255, 255, 255, 0.55); color: inherit; }
 .theme-toggle.on-band:hover { background: rgba(255, 255, 255, 0.12); }
+
+/* Fingerprint sign-in offer (installed app only) */
+.fp-offer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.6rem 1rem; margin-bottom: 1rem; padding: 0.75rem 1rem; background: var(--paper); border: 1px solid var(--rule); border-left: 3px solid var(--accent, var(--out)); border-radius: 2px; }
+.fp-offer p { margin: 0; font-size: 0.95rem; }
+.fp-offer .fp-error { flex-basis: 100%; color: var(--out); }
+.fp-actions { display: flex; align-items: center; gap: 0.9rem; }
