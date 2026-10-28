@@ -252,6 +252,7 @@ npm run lint      # oxlint
 
 - **Vercel, two projects.** The backend (`Backend/api/index.py`, Python runtime) and the frontend (static build) deploy separately. Neon provides Postgres.
 - **Nightly detection.** `Backend/vercel.json` schedules `/api/internal/detect-recurring/` at `0 20 * * *` (UTC), authenticated with `CRON_SECRET`. No always-on worker is needed.
+- **Installable app.** The frontend ships a web manifest, icons and a small service worker, so it can be added to a home screen or desktop and opens in its own window. In Chrome or Edge use the install icon in the address bar, on Android choose "Add to Home screen", on iPhone use Share then "Add to Home Screen". The service worker only keeps the app shell for offline use: API calls go to a different origin and are never cached, so no financial data is stored by it.
 - **CI.** `.github/workflows/ci.yml` runs black, isort, flake8 and `pytest --cov` against a Postgres 15 service on every push and pull request.
 
 ## 📄 License
