@@ -1,7 +1,8 @@
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 
 import { useAuth } from "../auth/AuthContext"
+import { deviceCredential, signedOutDeliberately, useFingerprintAvailable, wasCancelled } from "../auth/fingerprint"
 import AuthShell from "../components/AuthShell.jsx"
 import GoogleButton from "../components/GoogleButton.jsx"
 import { Alert, Button, TextField } from "../components/ui.jsx"
@@ -19,7 +20,7 @@ function afterLogin(search, fallback) {
 
 function Login() {
   useDocumentTitle("Sign in")
-  const { login, loginWithGoogle } = useAuth()
+  const { login, loginWithGoogle, loginWithFingerprint } = useAuth()
   const navigate = useNavigate()
   const { state, search } = useLocation()
   const [email, setEmail] = useState(state?.demo ? DEMO_EMAIL : "")
@@ -27,6 +28,29 @@ function Login() {
   const [error, setError] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [googleBusy, setGoogleBusy] = useState(false)
+  const fingerprintReady = useFingerprintAvailable() && Boolean(deviceCredential())
+  const autoTried = useRef(false)
+
+  const handleFingerprint = useCallback(async () => {
+    setError("")
+    setSubmitting(true)
+    try {
+      await loginWithFingerprint()
+      navigate(afterLogin(search, "/app"))
+    } catch (err) {
+      if (!wasCancelled(err)) setError(err.status === 401 ? "Fingerprint wasn't accepted. Use your password." : formatError(err))
+    } finally {
+      setSubmitting(false)
+    }
+  }, [loginWithFingerprint, navigate, search])
+
+  // Ask for the fingerprint as soon as the page opens, except right after the person chose to sign out.
+  useEffect(() => {
+    if (fingerprintReady && !autoTried.current && !signedOutDeliberately()) {
+      autoTried.current = true
+      handleFingerprint()
+    }
+  }, [fingerprintReady, handleFingerprint])
 
   async function handleSubmit(event) {
     event.preventDefault()
@@ -79,6 +103,11 @@ function Login() {
   return (
     <AuthShell title="Sign in to your ledger" subtitle="Welcome back.">
       <form onSubmit={handleSubmit} className="auth-form" style={{ display: "grid", gap: "0.9rem" }}>
+        {fingerprintReady ? (
+          <Button type="button" className="full" onClick={handleFingerprint} disabled={submitting}>
+            Sign in with fingerprint
+          </Button>
+        ) : null}
         <GoogleButton onCredential={handleGoogle} onError={setError} busy={googleBusy} />
         <Alert>{error}</Alert>
         <TextField

@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react"
 
 import { changePassword as changePasswordRequest, fetchMe, obtainToken, obtainTokenWithGoogle, registerUser } from "../api/auth"
 import { clearTokens, getAccessToken } from "../api/client"
+import { clearSignedOut, fingerprintLogin } from "./fingerprint"
 
 const AuthContext = createContext(null)
 
@@ -29,6 +30,7 @@ export function AuthProvider({ children }) {
   async function login({ email, password }) {
     await obtainToken({ email, password })
     const me = await fetchMe()
+    clearSignedOut()
     setUser(me)
     return me
   }
@@ -41,6 +43,15 @@ export function AuthProvider({ children }) {
   async function loginWithGoogle(credential) {
     await obtainTokenWithGoogle(credential)
     const me = await fetchMe()
+    clearSignedOut()
+    setUser(me)
+    return me
+  }
+
+  async function loginWithFingerprint() {
+    await fingerprintLogin()
+    const me = await fetchMe()
+    clearSignedOut()
     setUser(me)
     return me
   }
@@ -61,6 +72,7 @@ export function AuthProvider({ children }) {
     isAuthenticated: Boolean(user),
     login,
     loginWithGoogle,
+    loginWithFingerprint,
     register,
     changePassword,
     signOut,
