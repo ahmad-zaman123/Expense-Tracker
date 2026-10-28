@@ -27,7 +27,7 @@ function Layout() {
   }
 
   return (
-    <div>
+    <div className="app-shell">
       <header className="band">
         <div className="band-inner">
           <span className="brand">

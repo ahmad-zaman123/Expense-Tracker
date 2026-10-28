@@ -17,7 +17,7 @@ function Specimen() {
   return (
     <figure className="specimen" style={{ margin: 0 }}>
       <div className="table-wrap">
-        <table className="ledger">
+        <table className="ledger stack">
           <caption>September</caption>
           <thead>
             <tr>
@@ -35,16 +35,16 @@ function Specimen() {
                   {row.name}
                   <span className="sub">{row.sub}</span>
                 </td>
-                <td className="num out">{row.out || ""}</td>
-                <td className="num in">{row.in || ""}</td>
+                <td className="num out" data-label="Out">{row.out || ""}</td>
+                <td className="num in" data-label="In">{row.in || ""}</td>
               </tr>
             ))}
           </tbody>
           <tfoot>
             <tr>
               <td colSpan={2}>Ruled off</td>
-              <td className="num">{totalOut}</td>
-              <td className="num">{totalIn}</td>
+              <td className="num" data-label="Out">{totalOut}</td>
+              <td className="num" data-label="In">{totalIn}</td>
             </tr>
           </tfoot>
         </table>

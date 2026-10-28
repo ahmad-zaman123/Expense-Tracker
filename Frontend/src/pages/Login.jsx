@@ -11,6 +11,8 @@ import { useDocumentTitle } from "../utils/useDocumentTitle"
 
 const DEMO_EMAIL = "demo@expense-tracker.app"
 const DEMO_PASSWORD = "demo1234"
+const FINGERPRINT =
+  "M12 11a3 3 0 0 0-3 3c0 2.5-.5 4-1.5 5.5M12 7a7 7 0 0 0-7 7c0 1.5-.2 3-.7 4M12 3a11 11 0 0 1 11 11c0 2-.3 3.5-.8 5M15 14c0 3-.7 5-2 7M9 3.5A11 11 0 0 0 1 14"
 
 /** Where to go after signing in: the local path the session expired on, or the app's home. */
 function afterLogin(search, fallback) {
@@ -103,11 +105,6 @@ function Login() {
   return (
     <AuthShell title="Sign in to your ledger" subtitle="Welcome back.">
       <form onSubmit={handleSubmit} className="auth-form" style={{ display: "grid", gap: "0.9rem" }}>
-        {fingerprintReady ? (
-          <Button type="button" className="full" onClick={handleFingerprint} disabled={submitting}>
-            Sign in with fingerprint
-          </Button>
-        ) : null}
         <GoogleButton onCredential={handleGoogle} onError={setError} busy={googleBusy} />
         <Alert>{error}</Alert>
         <TextField
@@ -129,6 +126,16 @@ function Login() {
         <Button type="submit" disabled={submitting} className="full">
           {submitting ? "Signing in…" : "Sign in"}
         </Button>
+        {fingerprintReady ? (
+          <div className="fp-wrap">
+            <button type="button" className="fp-btn" onClick={handleFingerprint} disabled={submitting} aria-label="Sign in with fingerprint" title="Sign in with fingerprint">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                <path d={FINGERPRINT} />
+              </svg>
+            </button>
+            <span aria-hidden="true">Use fingerprint</span>
+          </div>
+        ) : null}
       </form>
       <p className="auth-alt">
         <button type="button" className="text-btn" onClick={useDemo} disabled={submitting}>
