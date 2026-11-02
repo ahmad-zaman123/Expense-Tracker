@@ -138,6 +138,7 @@ function Login() {
         ) : null}
       </form>
       <p className="auth-alt">
+        <Link to="/forgot-password">Forgot password?</Link>
         <button type="button" className="text-btn" onClick={useDemo} disabled={submitting}>
           Use the demo account
         </button>

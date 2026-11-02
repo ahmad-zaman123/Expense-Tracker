@@ -33,8 +33,19 @@ export async function fetchMe() {
   return apiRequest("/auth/me/")
 }
 
+/** Changing the password ends every session, so keep the new pair the server returns for this one. */
 export async function changePassword(payload) {
-  return apiRequest("/auth/password/", { method: "POST", body: payload })
+  const data = await apiRequest("/auth/password/", { method: "POST", body: payload })
+  setTokens({ access: data.access, refresh: data.refresh })
+  return data
+}
+
+export async function forgotPassword(email) {
+  return apiRequest("/auth/password/forgot/", { method: "POST", auth: false, body: { email } })
+}
+
+export async function resetPassword(payload) {
+  return apiRequest("/auth/password/reset/", { method: "POST", auth: false, body: payload })
 }
 
 export function logout() {
