@@ -150,6 +150,8 @@ a { color: var(--focus); }
 /* the ledger */
 .table-wrap { overflow-x: auto; }
 table.ledger { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+/* Without this the page's .stack layout turns the table into a flex box and its columns stop lining up. */
+.ledger.stack { display: table; }
 .ledger caption { text-align: left; padding: 0 0 0.5rem; font-family: var(--serif); font-weight: 600; font-size: 1.1rem; }
 .ledger th { text-align: left; padding: 0.55rem 0.75rem 0.55rem 0; font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-2); border-top: 2px solid var(--rule-strong); border-bottom: 1px solid var(--rule-strong); white-space: nowrap; }
 .ledger td { padding: 0.6rem 0.75rem 0.6rem 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
