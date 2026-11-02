@@ -116,8 +116,6 @@ class Command(BaseCommand):
                 if every and back % every:
                     continue
                 when = date(start.year, start.month, day)
-                if when > today:
-                    continue
                 fixed = payee in (
                     "Acme Corp",
                     "Landlord",
@@ -126,6 +124,12 @@ class Command(BaseCommand):
                     "Fitness First",
                     "StormFiber",
                 )
+                if when > today:
+                    # Everyday spending lands on today, so budgets look real early in a month.
+                    # Regular charges keep their dates, which recurring detection depends on.
+                    if fixed or kind == INCOME:
+                        continue
+                    when = today
                 amount = (
                     Decimal(base) if fixed else (Decimal(base) * wobble).quantize(Decimal("50"))
                 )
