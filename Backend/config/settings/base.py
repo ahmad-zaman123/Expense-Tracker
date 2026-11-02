@@ -1,5 +1,6 @@
 from datetime import timedelta
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import environ
 
@@ -144,6 +145,8 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    # Tokens carry a hash of the password, so changing it ends every existing session.
+    "CHECK_REVOKE_TOKEN": True,
 }
 
 SPECTACULAR_SETTINGS = {
@@ -167,3 +170,18 @@ CORS_ALLOWED_ORIGINS = env.list(
 
 # Google sign-in (optional). The OAuth client id from Google Cloud Console; empty disables the endpoint.
 GOOGLE_CLIENT_ID = env("GOOGLE_CLIENT_ID", default="")
+
+
+# Password reset email (optional). An empty SMTP_HOST disables the endpoint.
+EMAIL_HOST = env("SMTP_HOST", default="")
+EMAIL_PORT = env.int("SMTP_PORT", default=587)
+EMAIL_HOST_USER = env("SMTP_USER", default="")
+EMAIL_HOST_PASSWORD = env("SMTP_PASSWORD", default="")
+EMAIL_USE_TLS = True
+EMAIL_TIMEOUT = 10
+DEFAULT_FROM_EMAIL = env("EMAIL_FROM", default=EMAIL_HOST_USER)
+PASSWORD_RESET_TIMEOUT = 15 * 60
+# Reset links open the frontend: its first allowed origin, never the request's Host header.
+# Only the scheme and host are kept, in case the setting holds a full page address.
+_frontend = urlsplit(CORS_ALLOWED_ORIGINS[0])
+APP_URL = f"{_frontend.scheme}://{_frontend.netloc}"
