@@ -115,6 +115,7 @@ npm run dev
 | `CORS_ALLOWED_ORIGINS` | no | Comma-separated frontend origins. Defaults to the local Vite dev server. |
 | `CSRF_TRUSTED_ORIGINS` | prod | Comma-separated, used by `config.settings.prod`. |
 | `GOOGLE_CLIENT_ID` | no | Turns on "Continue with Google" on the sign-in page. See **Google sign-in** below. |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `EMAIL_FROM` | no | Turn on **Forgot password?**. See **Password reset** below. |
 
 Frontend: `VITE_API_URL` points at the backend's `/api`; `VITE_GOOGLE_CLIENT_ID` is the same Google client id, only needed for the Google button.
 
@@ -131,6 +132,20 @@ Adds a **Continue with Google** button to the sign-in page. First-time Google us
 3. Put the client ID in `GOOGLE_CLIENT_ID` (backend) **and** `VITE_GOOGLE_CLIENT_ID` (frontend) and redeploy both. There is no client secret in this flow: the backend verifies the Google ID token with Google's public keys and then issues the usual JWT pair from `POST /api/auth/google/`.
 
 Leave both variables empty and the button is hidden.
+
+</details>
+
+<details>
+<summary><b>✉️ Password reset</b> (optional, free)</summary>
+<br/>
+
+Adds **Forgot password?** to the sign-in page. It emails a link that works once and expires in 15 minutes. Using it, or changing a password from the account menu, ends the account's other sessions. The reply never reveals whether an address has an account, and requests are limited per address, per IP and per day.
+
+1. For Gmail, turn on 2-Step Verification and create an [app password](https://myaccount.google.com/apppasswords).
+2. Set `SMTP_HOST=smtp.gmail.com`, `SMTP_PORT=587`, `SMTP_USER`, `SMTP_PASSWORD` and `EMAIL_FROM` on the backend, and keep the frontend's address first in `CORS_ALLOWED_ORIGINS`, because reset links open that address.
+3. Run the `users.0003_ratewindow` migration on the production database.
+
+Leave `SMTP_HOST` empty and the endpoint replies that reset isn't available.
 
 </details>
 
