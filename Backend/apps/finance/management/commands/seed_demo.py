@@ -147,18 +147,17 @@ class Command(BaseCommand):
                 )
         Transaction.objects.bulk_create(rows)
 
-        # Two transfers between the accounts (these move balances, never income or expense).
-        for back, day, amount in ((1, 8, 8000), (0, 3, 10000)):
-            when = date(month_start(today, back).year, month_start(today, back).month, day)
-            if when <= today:
-                create_transfer(
-                    user=user,
-                    from_account=accounts["HBL Savings"],
-                    to_account=accounts["Cash Wallet"],
-                    amount=Decimal(amount),
-                    occurred_at=at_noon(when),
-                    description="Cash for the month",
-                )
+        # A monthly top-up keeps the wallet above zero (transfers move balances, never income or
+        # expense). The 1st of the month is always on or before today.
+        for back in range(MONTHS - 1, -1, -1):
+            create_transfer(
+                user=user,
+                from_account=accounts["HBL Savings"],
+                to_account=accounts["Cash Wallet"],
+                amount=Decimal("20000"),
+                occurred_at=at_noon(month_start(today, back)),
+                description="Cash for the month",
+            )
 
         for name, limit in BUDGETS:
             Budget.objects.create(user=user, category=categories[name], amount=Decimal(limit))

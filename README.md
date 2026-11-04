@@ -159,7 +159,7 @@ Leave `SMTP_HOST` empty and the endpoint replies that reset isn't available.
 <summary><b>🔑 Demo account</b> (live site)</summary>
 <br/>
 
-Sign in with **`demo@expense-tracker.app`** / **`demo1234`**. It is pre-loaded with two accounts, three months of transactions, budgets, a transfer and detected subscriptions, so the dashboard, reports and charts are populated on first login.
+Sign in with **`demo@expense-tracker.app`** / **`demo1234`**. It is pre-loaded with two accounts, three months of transactions, budgets, monthly transfers and detected subscriptions, so the dashboard, reports and charts are populated on first login.
 
 </details>
 
