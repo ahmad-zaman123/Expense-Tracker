@@ -101,6 +101,12 @@ cp .env.example .env            # VITE_API_URL=http://127.0.0.1:8000/api
 npm run dev
 ```
 
+**3. Tests**
+
+```bash
+cd Backend && make test
+```
+
 <details>
 <summary><b>🔧 Environment variables</b> (<code>Backend/.env</code>)</summary>
 <br/>
@@ -238,34 +244,6 @@ Expense-Tracker/
 └── Frontend/
     └── src/                pages · components · api · auth
 ```
-
-## ⚙️ Development
-
-<details>
-<summary><b>Backend</b></summary>
-<br/>
-
-```bash
-make test               # pytest
-make lint               # flake8
-make format             # black + isort
-make detect-recurring   # run recurring detection by hand
-make compile            # re-pin requirements/*.in
-```
-
-</details>
-
-<details>
-<summary><b>Frontend</b></summary>
-<br/>
-
-```bash
-npm run dev       # dev server
-npm run build     # production build
-npm run lint      # oxlint
-```
-
-</details>
 
 ## ☁️ Deployment & CI
 
