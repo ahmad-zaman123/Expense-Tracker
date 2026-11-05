@@ -15,7 +15,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT license" /></a>
 </p>
 
-https://github.com/user-attachments/assets/6dafa34b-ae4e-43aa-b945-5ea9fdc6b768
+https://github.com/user-attachments/assets/4e6438b2-fc7c-4d28-adfd-e1f2a9a945b8
 
 <p align="center">
   <a href="#-quick-start">Quick start</a> ·
