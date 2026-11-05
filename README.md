@@ -15,12 +15,17 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT license" /></a>
 </p>
 
+<p align="center">
+  <a href="https://expense-tracker-three-vert-61.vercel.app"><b>Live demo → expense-tracker-three-vert-61.vercel.app</b></a><br/>
+  <sub>Click <b>Try the live demo</b> to sign in to a demo account with six months of transactions, budgets and subscriptions. No sign-up needed.</sub>
+</p>
+
 https://github.com/user-attachments/assets/4e6438b2-fc7c-4d28-adfd-e1f2a9a945b8
 
 <p align="center">
   <a href="#-quick-start">Quick start</a> ·
-  <a href="#-features">Features</a> ·
   <a href="#-how-it-works">How it works</a> ·
+  <a href="#-features">Features</a> ·
   <a href="#-csv-import-format">CSV import</a> ·
   <a href="#-api">API</a> ·
   <a href="#-deployment--ci">Deployment</a>
@@ -42,59 +47,6 @@ A full-stack personal finance app. Log income and expenses across accounts, move
     <img src="docs/screenshots/dashboard.png" alt="The dashboard: this month's money in and out, the total balance and a six-month chart" width="860" />
   </picture>
 </p>
-
-## ✨ Features
-
-<table>
-<tr>
-<td width="50%" valign="top">
-
-### 🏦 Accounts
-Balances are computed from transactions, never stored, so they can't drift.
-
-### 🧾 Transactions
-Income and expenses with categories and payees. Filter by month and category, or bulk-import a bank statement.
-
-### 🔀 Transfers
-Move money between accounts. Balances change, reports don't.
-
-</td>
-<td width="50%" valign="top">
-
-### 🎯 Budgets
-Monthly per-category limits with progress bars.
-
-### 📊 Reports
-Monthly income / expense / net and a 6-month cashflow chart.
-
-### 🔁 Recurring detection
-Surfaces subscriptions with payee, cadence, next due date and a confidence score. Runs nightly, and can be dismissed per rule.
-
-### 🔑 Fingerprint sign-in
-In the **installed app** only, you can unlock with your fingerprint or face instead of typing a password. It uses passkeys (WebAuthn), so the biometric never leaves the phone and the server stores just a public key. The shared demo account is excluded.
-
-</td>
-</tr>
-</table>
-
-<table>
-<tr>
-<td width="50%" valign="top">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/budgets-dark.png" />
-    <img src="docs/screenshots/budgets.png" alt="Budgets with progress bars: on track, nearly used and over the limit" />
-  </picture>
-  <p align="center"><sub>Budgets: on track, nearly used or over</sub></p>
-</td>
-<td width="50%" valign="top">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/recurring-dark.png" />
-    <img src="docs/screenshots/recurring.png" alt="Detected subscriptions with payee, cadence, next due date and confidence" />
-  </picture>
-  <p align="center"><sub>Recurring: found from your history</sub></p>
-</td>
-</tr>
-</table>
 
 ## 🚀 Quick start
 
@@ -183,7 +135,7 @@ Leave `SMTP_HOST` empty and the endpoint replies that reset isn't available.
 <summary><b>🔑 Demo account</b> (live site)</summary>
 <br/>
 
-Sign in with **`demo@expense-tracker.app`** / **`demo1234`**. It is pre-loaded with two accounts, three months of transactions, budgets, monthly transfers and detected subscriptions, so the dashboard, reports and charts are populated on first login.
+Sign in with **`demo@expense-tracker.app`** / **`demo1234`**. It is pre-loaded with two accounts, six months of transactions, budgets, monthly transfers and detected subscriptions, so the dashboard, reports and charts are populated on first login.
 
 </details>
 
@@ -208,6 +160,59 @@ Most CRUD demos are forgettable. The backend is organised around four problems t
 | **Month boundaries** | "July spending" depends on the user's timezone, not the server's. Each month's `[start, end)` is computed at **Asia/Karachi** midnight and queried in UTC, so `2026-08-01 00:30 PKT` counts in August. Proven by a boundary test. | `apps/reports/services.py` |
 | **Duplicate imports** | Each CSV row is hashed (`sha256(account │ date │ amount │ description)`) and written with `bulk_create(ignore_conflicts=True)` against a partial unique constraint. **Re-uploading a file creates zero duplicates.** Malformed rows are reported, not fatal. | `apps/finance/services/imports.py` |
 | **Subscription detection** | Groups non-transfer transactions by `(payee, account, kind)`. With at least three occurrences 25 to 35 days apart, it records a `RecurringRule` with average amount, cadence, next date and a confidence from gap regularity. Idempotent via `update_or_create`. | `apps/finance/services/recurring.py` |
+
+## ✨ Features
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### 🏦 Accounts
+Balances are computed from transactions, never stored, so they can't drift.
+
+### 🧾 Transactions
+Income and expenses with categories and payees. Filter by month and category, or bulk-import a bank statement.
+
+### 🔀 Transfers
+Move money between accounts. Balances change, reports don't.
+
+</td>
+<td width="50%" valign="top">
+
+### 🎯 Budgets
+Monthly per-category limits with progress bars.
+
+### 📊 Reports
+Monthly income / expense / net and a 6-month cashflow chart.
+
+### 🔁 Recurring detection
+Surfaces subscriptions with payee, cadence, next due date and a confidence score. Runs nightly, and can be dismissed per rule.
+
+### 🔑 Fingerprint sign-in
+In the **installed app** only, you can unlock with your fingerprint or face instead of typing a password. It uses passkeys (WebAuthn), so the biometric never leaves the phone and the server stores just a public key. The shared demo account is excluded.
+
+</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="50%" valign="top">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/budgets-dark.png" />
+    <img src="docs/screenshots/budgets.png" alt="Budgets with progress bars: on track, nearly used and over the limit" />
+  </picture>
+  <p align="center"><sub>Budgets: on track, nearly used or over</sub></p>
+</td>
+<td width="50%" valign="top">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/recurring-dark.png" />
+    <img src="docs/screenshots/recurring.png" alt="Detected subscriptions with payee, cadence, next due date and confidence" />
+  </picture>
+  <p align="center"><sub>Recurring: found from your history</sub></p>
+</td>
+</tr>
+</table>
 
 ## 📥 CSV import format
 
