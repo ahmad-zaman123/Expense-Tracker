@@ -176,6 +176,9 @@ Income and expenses with categories and payees. Filter by month and category, or
 ### 🔀 Transfers
 Move money between accounts. Balances change, reports don't.
 
+### 📲 Installable app
+Add it to a home screen or desktop and it opens in its own window: the install icon in Chrome or Edge, "Add to Home screen" on Android, or Share then "Add to Home Screen" on iPhone. The service worker keeps only the app shell for offline use. API calls are never cached, so no financial data is stored on the device.
+
 </td>
 <td width="50%" valign="top">
 
@@ -189,7 +192,7 @@ Monthly income / expense / net and a 6-month cashflow chart.
 Surfaces subscriptions with payee, cadence, next due date and a confidence score. Runs nightly, and can be dismissed per rule.
 
 ### 🔑 Fingerprint sign-in
-In the **installed app** only, you can unlock with your fingerprint or face instead of typing a password. It uses passkeys (WebAuthn), so the biometric never leaves the phone and the server stores just a public key. The shared demo account is excluded.
+In the **installed app** only, you can unlock with your fingerprint or face instead of typing a password. It uses passkeys (WebAuthn), so the biometric never leaves the phone and the server stores just a public key. The signature is checked with `ecdsa` (pure Python), so it runs on Vercel without compiled wheels. The shared demo account is excluded.
 
 </td>
 </tr>
@@ -286,8 +289,7 @@ Expense-Tracker/
 - **Vercel, two projects.** The backend (`Backend/api/index.py`, Python runtime) and the frontend (static build) deploy separately. Neon provides Postgres.
 - **Nightly detection.** `Backend/vercel.json` schedules `/api/internal/detect-recurring/` at `0 20 * * *` (UTC), authenticated with `CRON_SECRET`. No always-on worker is needed.
 - **Database migrations.** Vercel doesn't run them. After deploying a change that adds a migration (the fingerprint tables are `users.0002_passkeys`), run `python manage.py migrate` once against the production database, for example `DATABASE_URL=<neon url> python manage.py migrate`.
-- **Fingerprint sign-in needs no new settings.** The API accepts it only from origins already listed in `CORS_ALLOWED_ORIGINS`, and uses that origin's host name as the relying-party id, so keep your frontend URL in that list. It uses `ecdsa` (pure Python) for the signature check, which avoids compiled wheels on Vercel.
-- **Installable app.** The frontend ships a web manifest, icons and a small service worker, so it can be added to a home screen or desktop and opens in its own window. In Chrome or Edge use the install icon in the address bar, on Android choose "Add to Home screen", on iPhone use Share then "Add to Home Screen". The service worker only keeps the app shell for offline use: API calls go to a different origin and are never cached, so no financial data is stored by it.
+- **Fingerprint sign-in needs no new settings.** It only works from origins listed in `CORS_ALLOWED_ORIGINS`, so keep your frontend URL in that list.
 - **CI.** `.github/workflows/ci.yml` runs black, isort, flake8 and `pytest --cov` against a Postgres 15 service on every push and pull request.
 
 ## 📄 License
