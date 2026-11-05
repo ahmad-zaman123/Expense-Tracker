@@ -9,6 +9,7 @@ from apps.finance.models import Account, Budget, RecurringRule, Transaction
 from apps.users.constants import DEMO_FULL, DEMO_LIMITS, DEMO_PASSWORD_LOCKED, DEMO_TOO_MANY
 from apps.users.demo import DEMO_DOMAIN, DEMO_LIFETIME, PURGE_BATCH, is_demo_email
 from apps.users.models import RateWindow, User
+from apps.users.serializers import UserSerializer
 
 DEMO = "/api/auth/demo/"
 
@@ -22,6 +23,11 @@ class DemoTests(TestCase):
 
     def auth(self, access):
         return {"HTTP_AUTHORIZATION": f"Bearer {access}"}
+
+    def test_me_says_whether_the_account_is_a_demo(self):
+        me = self.client.get("/api/auth/me/", **self.auth(self.start().json()["access"])).json()
+        self.assertIs(me["is_demo"], True)
+        self.assertIs(UserSerializer(User(email="sara@example.com")).data["is_demo"], False)
 
     def test_demo_signs_in_a_new_user_with_sample_data(self):
         response = self.start()
