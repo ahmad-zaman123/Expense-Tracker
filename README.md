@@ -26,10 +26,6 @@ https://github.com/user-attachments/assets/4e6438b2-fc7c-4d28-adfd-e1f2a9a945b8
   <a href="#-deployment--ci">Deployment</a>
 </p>
 
-<p align="center">
-  <img src="docs/screenshots/dashboard.png" alt="Expense Tracker dashboard" width="860" />
-</p>
-
 ---
 
 ## 🧭 What is Expense Tracker?
@@ -39,6 +35,10 @@ A full-stack personal finance app. Log income and expenses across accounts, move
 | 💰 Track | 🎯 Plan | 🔁 Detect |
 |---|---|---|
 | Accounts with live balances, transactions with categories and payees, transfers that don't pollute reports | Monthly per-category budgets with spent / remaining progress | Subscriptions found from your history: payee, cadence, next due date, confidence |
+
+<p align="center">
+  <img src="docs/screenshots/dashboard.png" alt="Expense Tracker dashboard" width="860" />
+</p>
 
 ## ✨ Features
 
