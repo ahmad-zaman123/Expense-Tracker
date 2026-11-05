@@ -9,10 +9,10 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.users import passkeys
+from apps.users.demo import is_demo_user
 from apps.users.models import Passkey, PasskeyChallenge
 
 # The shared demo account is open to anyone, so a fingerprint must never be able to claim it.
-DEMO_EMAIL = "demo@expense-tracker.app"
 
 FAILED = "Fingerprint sign-in could not be verified. Use your password."
 
@@ -57,10 +57,8 @@ class RegisterOptionsAPIView(APIView):
     throttle_classes = (PasskeyThrottle,)
 
     def post(self, request):
-        if request.user.email.lower() == DEMO_EMAIL:
-            return _fail(
-                "The shared demo account can't use fingerprint sign-in.", status.HTTP_403_FORBIDDEN
-            )
+        if is_demo_user(request.user):
+            return _fail("Demo accounts can't use fingerprint sign-in.", status.HTTP_403_FORBIDDEN)
         try:
             _, rp_id = _origin_and_rp(request)
         except passkeys.PasskeyError:
@@ -97,10 +95,8 @@ class RegisterVerifyAPIView(APIView):
     throttle_classes = (PasskeyThrottle,)
 
     def post(self, request):
-        if request.user.email.lower() == DEMO_EMAIL:
-            return _fail(
-                "The shared demo account can't use fingerprint sign-in.", status.HTTP_403_FORBIDDEN
-            )
+        if is_demo_user(request.user):
+            return _fail("Demo accounts can't use fingerprint sign-in.", status.HTTP_403_FORBIDDEN)
         credential = request.data.get("credential")
         response = credential.get("response") if isinstance(credential, dict) else None
         if not isinstance(response, dict):
@@ -182,7 +178,7 @@ class LoginVerifyAPIView(APIView):
             )
         except passkeys.PasskeyError:
             return _fail(FAILED, status.HTTP_401_UNAUTHORIZED)
-        if not user.is_active or user.email.lower() == DEMO_EMAIL:
+        if not user.is_active or is_demo_user(user):
             return _fail("This account is disabled.", status.HTTP_403_FORBIDDEN)
 
         passkey.sign_count = counter

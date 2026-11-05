@@ -1,5 +1,15 @@
 DEMO_EMAIL = "demo@expense-tracker.app"
-DEMO_PASSWORD_LOCKED = "The demo account is shared, so its password can't be changed."
+DEMO_PASSWORD_LOCKED = (
+    "Demo accounts can't have a password. Create your own account to keep your data."
+)
+DEMO_TOO_MANY = "Too many demos started from here. Please try again in an hour."
+DEMO_FULL = "The demo is full for today. Please try again tomorrow."
+
+# (limit, window in seconds) for new private demos.
+DEMO_LIMITS = {
+    "demo_ip": (10, 3600),
+    "demo_all": (500, 86400),
+}
 
 RESET_SENT = "If that email has an account, we've sent a reset link."
 RESET_INVALID = "This reset link is invalid or has expired."

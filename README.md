@@ -17,7 +17,7 @@
 
 <p align="center">
   <a href="https://expense-tracker-three-vert-61.vercel.app"><b>Live demo → expense-tracker-three-vert-61.vercel.app</b></a><br/>
-  <sub>Click <b>Try the live demo</b> to sign in to a demo account with six months of transactions, budgets and subscriptions. No sign-up needed.</sub>
+  <sub>Click <b>Try the live demo</b> to get your own private demo account with six months of transactions, budgets and subscriptions. No sign-up needed.</sub>
 </p>
 
 https://github.com/user-attachments/assets/4e6438b2-fc7c-4d28-adfd-e1f2a9a945b8
@@ -132,10 +132,16 @@ Leave `SMTP_HOST` empty and the endpoint replies that reset isn't available.
 </details>
 
 <details>
-<summary><b>🔑 Demo account</b> (live site)</summary>
+<summary><b>🔑 Live demo</b> (live site)</summary>
 <br/>
 
-Sign in with **`demo@expense-tracker.app`** / **`demo1234`**. It is pre-loaded with two accounts, six months of transactions, budgets, monthly transfers and detected subscriptions, so the dashboard, reports and charts are populated on first login.
+Click **Try the live demo** on the home or sign-in page. `POST /api/auth/demo/` creates a fresh account just for you, with two accounts, six months of transactions, budgets, monthly transfers and detected subscriptions, and signs you in. Nobody else sees what you add or delete.
+
+- Demo accounts can't set a password, add fingerprint sign-in or get reset emails.
+- Each one is deleted after two days. Old ones are cleaned up whenever a new demo starts, so no cron job is needed.
+- **Limits:** 10 demos per IP address per hour and 500 a day in total, so the database can't be filled up.
+
+For local development, `python manage.py seed_demo` still creates a shared `demo@expense-tracker.app` / `demo1234` login.
 
 </details>
 
@@ -192,7 +198,7 @@ Monthly income / expense / net and a 6-month cashflow chart.
 Surfaces subscriptions with payee, cadence, next due date and a confidence score. Runs nightly, and can be dismissed per rule.
 
 ### 🔑 Fingerprint sign-in
-In the **installed app** only, you can unlock with your fingerprint or face instead of typing a password. It uses passkeys (WebAuthn), so the biometric never leaves the phone and the server stores just a public key. The signature is checked with `ecdsa` (pure Python), so it runs on Vercel without compiled wheels. The shared demo account is excluded.
+In the **installed app** only, you can unlock with your fingerprint or face instead of typing a password. It uses passkeys (WebAuthn), so the biometric never leaves the phone and the server stores just a public key. The signature is checked with `ecdsa` (pure Python), so it runs on Vercel without compiled wheels. Demo accounts are excluded.
 
 </td>
 </tr>
@@ -246,11 +252,11 @@ Rows that repeat an earlier import are skipped, and rows with a bad date, amount
 
 ## 🔌 API
 
-Interactive docs at **`/api/docs/`** (Swagger), JSON schema at `/api/schema/`. Everything needs a JWT except registration and login; the internal endpoint uses a shared secret instead.
+Interactive docs at **`/api/docs/`** (Swagger), JSON schema at `/api/schema/`. Everything needs a JWT except registration, login and starting a demo; the internal endpoint uses a shared secret instead.
 
 | Area | Endpoints |
 |---|---|
-| **Auth** | `POST /api/auth/register/`, `/auth/token/`, `/auth/token/refresh/`, `/auth/google/`, `/auth/password/`, `GET /auth/me/` |
+| **Auth** | `POST /api/auth/register/`, `/auth/demo/`, `/auth/token/`, `/auth/token/refresh/`, `/auth/google/`, `/auth/password/`, `GET /auth/me/` |
 | **Fingerprint** | `POST /api/auth/passkey/register/options/` and `/verify/` (signed in), `POST /api/auth/passkey/login/options/` and `/verify/`, `GET /api/auth/passkeys/`, `DELETE /api/auth/passkeys/<id>/` |
 | **Finance** | `/api/accounts/`, `/categories/`, `/budgets/`, `/transactions/`, `/transfers/` (list, create, detail) |
 | **Import** | `POST /api/transactions/import/` |

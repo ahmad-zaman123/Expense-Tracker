@@ -29,6 +29,13 @@ export async function obtainTokenWithGoogle(credential) {
   return data
 }
 
+/** Start a private demo: the server creates a fresh account with sample data and signs us in. */
+export async function startDemo() {
+  const data = await apiRequest("/auth/demo/", { method: "POST", auth: false })
+  setTokens({ access: data.access, refresh: data.refresh })
+  return data
+}
+
 export async function fetchMe() {
   return apiRequest("/auth/me/")
 }

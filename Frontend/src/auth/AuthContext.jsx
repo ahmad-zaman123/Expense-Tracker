@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react"
 
-import { changePassword as changePasswordRequest, fetchMe, obtainToken, obtainTokenWithGoogle, registerUser } from "../api/auth"
+import { changePassword as changePasswordRequest, fetchMe, obtainToken, obtainTokenWithGoogle, registerUser, startDemo } from "../api/auth"
 import { clearTokens, getAccessToken } from "../api/client"
 import { clearSignedOut, fingerprintLogin } from "./fingerprint"
 
@@ -48,6 +48,14 @@ export function AuthProvider({ children }) {
     return me
   }
 
+  async function loginAsDemo() {
+    await startDemo()
+    const me = await fetchMe()
+    clearSignedOut()
+    setUser(me)
+    return me
+  }
+
   async function loginWithFingerprint() {
     await fingerprintLogin()
     const me = await fetchMe()
@@ -73,6 +81,7 @@ export function AuthProvider({ children }) {
     login,
     loginWithGoogle,
     loginWithFingerprint,
+    loginAsDemo,
     register,
     changePassword,
     signOut,

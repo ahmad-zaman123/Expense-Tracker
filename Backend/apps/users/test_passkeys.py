@@ -14,8 +14,8 @@ from django.utils import timezone
 from rest_framework.test import APIClient
 
 from apps.users import passkeys
+from apps.users.constants import DEMO_EMAIL
 from apps.users.models import Passkey, PasskeyChallenge
-from apps.users.passkey_views import DEMO_EMAIL
 
 User = get_user_model()
 ORIGIN = "http://localhost:5173"

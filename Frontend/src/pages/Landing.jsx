@@ -1,7 +1,9 @@
-import { Link, Navigate } from "react-router-dom"
+import { useState } from "react"
+import { Link, Navigate, useNavigate } from "react-router-dom"
 
 import { useAuth } from "../auth/AuthContext"
 import ThemeToggle from "../components/ThemeToggle.jsx"
+import { formatError } from "../utils/errors"
 
 // A synthetic example page, labelled as such below.
 const SPECIMEN = [
@@ -55,7 +57,22 @@ function Specimen() {
 }
 
 function Landing() {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, loginAsDemo } = useAuth()
+  const navigate = useNavigate()
+  const [demoBusy, setDemoBusy] = useState(false)
+  const [demoError, setDemoError] = useState("")
+
+  async function startDemo() {
+    setDemoError("")
+    setDemoBusy(true)
+    try {
+      await loginAsDemo()
+      navigate("/app")
+    } catch (err) {
+      setDemoError(formatError(err))
+      setDemoBusy(false)
+    }
+  }
 
   if (isAuthenticated) {
     return <Navigate to="/app" replace />
@@ -91,10 +108,15 @@ function Landing() {
             <Link to="/register" className="btn" style={{ textDecoration: "none" }}>
               Get started — it&apos;s free
             </Link>
-            <Link to="/login" state={{ demo: true }} className="btn outline" style={{ textDecoration: "none" }}>
-              Try the live demo
-            </Link>
+            <button type="button" className="btn outline" onClick={startDemo} disabled={demoBusy}>
+              {demoBusy ? "Setting up your demo…" : "Try the live demo"}
+            </button>
           </div>
+          {demoError && (
+            <p className="error-banner" role="alert" style={{ marginTop: "0.8rem" }}>
+              {demoError}
+            </p>
+          )}
           <ul className="landing-points">
             <li>Balances are worked out from your entries, so they cannot drift.</li>
             <li>Months follow Pakistan time, so a late-night entry lands in the right month.</li>

@@ -5,7 +5,8 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils.http import urlsafe_base64_decode
 from rest_framework import serializers
 
-from apps.users.constants import DEMO_EMAIL, DEMO_PASSWORD_LOCKED, RESET_INVALID
+from apps.users.constants import DEMO_PASSWORD_LOCKED, RESET_INVALID
+from apps.users.demo import is_demo_user
 
 User = get_user_model()
 
@@ -53,7 +54,7 @@ class ChangePasswordSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         user = self.context["request"].user
-        if user.email.lower() == DEMO_EMAIL:
+        if is_demo_user(user):
             raise serializers.ValidationError({"detail": DEMO_PASSWORD_LOCKED})
         current = attrs.get("current_password") or ""
         if user.has_usable_password() and not (current and user.check_password(current)):
@@ -98,7 +99,7 @@ class ResetPasswordSerializer(serializers.Serializer):
             user = None
         if (
             user is None
-            or user.email.lower() == DEMO_EMAIL
+            or is_demo_user(user)
             or not default_token_generator.check_token(user, attrs["token"])
         ):
             raise serializers.ValidationError({"detail": RESET_INVALID})
