@@ -37,7 +37,10 @@ A full-stack personal finance app. Log income and expenses across accounts, move
 | Accounts with live balances, transactions with categories and payees, transfers that don't pollute reports | Monthly per-category budgets with spent / remaining progress | Subscriptions found from your history: payee, cadence, next due date, confidence |
 
 <p align="center">
-  <img src="docs/screenshots/dashboard.png" alt="Expense Tracker dashboard" width="860" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/dashboard-dark.png" />
+    <img src="docs/screenshots/dashboard.png" alt="The dashboard: this month's money in and out, the total balance and a six-month chart" width="860" />
+  </picture>
 </p>
 
 ## ✨ Features
@@ -70,6 +73,25 @@ Surfaces subscriptions with payee, cadence, next due date and a confidence score
 ### 🔑 Fingerprint sign-in
 In the **installed app** only, you can unlock with your fingerprint or face instead of typing a password. It uses passkeys (WebAuthn), so the biometric never leaves the phone and the server stores just a public key. The shared demo account is excluded.
 
+</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="50%" valign="top">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/budgets-dark.png" />
+    <img src="docs/screenshots/budgets.png" alt="Budgets with progress bars: on track, nearly used and over the limit" />
+  </picture>
+  <p align="center"><sub>Budgets: on track, nearly used or over</sub></p>
+</td>
+<td width="50%" valign="top">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/recurring-dark.png" />
+    <img src="docs/screenshots/recurring.png" alt="Detected subscriptions with payee, cadence, next due date and confidence" />
+  </picture>
+  <p align="center"><sub>Recurring: found from your history</sub></p>
 </td>
 </tr>
 </table>
@@ -206,6 +228,13 @@ date,amount,description,payee,kind
 ```
 
 Rows that repeat an earlier import are skipped, and rows with a bad date, amount or kind are reported back without failing the file.
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/csv-import-dark.png" />
+    <img src="docs/screenshots/csv-import.png" alt="Importing the same bank statement a second time: imported 0, skipped 3" width="860" />
+  </picture>
+</p>
 
 ## 🔌 API
 
