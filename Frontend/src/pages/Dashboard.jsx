@@ -122,7 +122,7 @@ function Dashboard() {
                     const net = row.income - row.expense
                     return (
                       <tr key={row.month}>
-                        <td data-label="Month" className="day">{row.month}</td>
+                        <td data-label="Month" className="day">{formatMonth(row.month)}</td>
                         <td data-label="In" className="num in">{formatMoney(row.income)}</td>
                         <td data-label="Out" className="num out">{formatMoney(row.expense)}</td>
                         <td data-label="Net" className="num">{(net < 0 ? "−" : "") + formatMoney(Math.abs(net))}</td>

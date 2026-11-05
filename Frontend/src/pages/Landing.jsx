@@ -99,7 +99,7 @@ function Landing() {
 
       <main className="landing-main">
         <div>
-          <h1 className="landing-title">Know where your money goes.</h1>
+          <h1 className="landing-title">Know where your money goes</h1>
           <p className="landing-lede">
             Track income and expenses across accounts, set budgets, move money between accounts, and
             catch recurring subscriptions, all in one ledger.
