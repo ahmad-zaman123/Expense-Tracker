@@ -20,7 +20,7 @@
   <sub>Click <b>Try the live demo</b> to get your own private demo account with six months of transactions, budgets and subscriptions. No sign-up needed.</sub>
 </p>
 
-https://github.com/user-attachments/assets/4e6438b2-fc7c-4d28-adfd-e1f2a9a945b8
+https://github.com/user-attachments/assets/15a5dae8-96b8-4c48-b070-9e2e6ff06a6a
 
 <p align="center">
   <a href="#-quick-start">Quick start</a> ·
