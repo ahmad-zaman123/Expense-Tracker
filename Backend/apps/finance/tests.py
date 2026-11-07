@@ -524,3 +524,34 @@ class TestDetectRecurringInternal:
         )
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_stays_closed_without_a_configured_secret(self, db, settings):
+        settings.CRON_SECRET = ""
+        for header in (
+            {},
+            {"HTTP_AUTHORIZATION": "Bearer "},
+            {"HTTP_AUTHORIZATION": "Bearer insecure-cron-secret"},
+        ):
+            response = APIClient().get(reverse("detect-recurring-internal"), **header)
+            assert response.status_code == status.HTTP_503_SERVICE_UNAVAILABLE
+
+
+def test_production_settings_refuse_default_secrets():
+    import subprocess
+    import sys
+
+    def load(secret_key, cron_secret):
+        code = "import django; django.setup(); from django.conf import settings; print(repr(settings.CRON_SECRET))"
+        env = {
+            "DJANGO_SETTINGS_MODULE": "config.settings.prod",
+            "SECRET_KEY": secret_key,
+            "CRON_SECRET": cron_secret,
+            "DATABASE_URL": "sqlite:///unused.sqlite3",
+            "PATH": "",
+        }
+        return subprocess.run([sys.executable, "-c", code], env=env, capture_output=True, text=True)
+
+    refused = load("insecure-dev-key-change-me", "x" * 32)
+    assert refused.returncode != 0 and "Set SECRET_KEY" in refused.stderr
+    assert load("k" * 50, "insecure-cron-secret").stdout.strip() == "''"
+    assert load("k" * 50, "c" * 32).stdout.strip() == repr("c" * 32)

@@ -164,6 +164,11 @@ class DetectRecurringInternalAPIView(APIView):
 
     @extend_schema(exclude=True)
     def get(self, request, *args, **kwargs):
+        if not settings.CRON_SECRET:
+            return Response(
+                {"detail": "Cron secret is not configured."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
         provided = request.headers.get("Authorization", "")
         expected = "Bearer %s" % settings.CRON_SECRET
         if not constant_time_compare(provided, expected):

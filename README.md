@@ -8,7 +8,7 @@
 <p align="center">
   <a href="https://github.com/ahmad-zaman123/Expense-Tracker/actions/workflows/ci.yml"><img src="https://github.com/ahmad-zaman123/Expense-Tracker/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
   <a href="https://expense-tracker-three-vert-61.vercel.app"><img src="https://img.shields.io/badge/live-demo-000?logo=vercel&logoColor=white&style=flat-square" alt="Live demo" /></a>
-  <img src="https://img.shields.io/badge/Django-4.2-092E20?logo=django&logoColor=white&style=flat-square" alt="Django 4.2" />
+  <img src="https://img.shields.io/badge/Django-5.2-092E20?logo=django&logoColor=white&style=flat-square" alt="Django 5.2" />
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black&style=flat-square" alt="React 19" />
   <img src="https://img.shields.io/badge/Tailwind-4-06B6D4?logo=tailwindcss&logoColor=white&style=flat-square" alt="Tailwind 4" />
   <img src="https://img.shields.io/badge/PostgreSQL-Neon-4169E1?logo=postgresql&logoColor=white&style=flat-square" alt="PostgreSQL" />
@@ -89,9 +89,9 @@ cd Backend && make test
 
 | Key | Required | Notes |
 |---|---|---|
-| `SECRET_KEY` | **yes** | Django secret key. Use a long random string. |
+| `SECRET_KEY` | **yes** | Django secret key, which signs login tokens. Production refuses to start without a random value of 40+ characters. Make one with `python -c "import secrets; print(secrets.token_urlsafe(50))"`. |
 | `DATABASE_URL` | **yes** | Local: `postgres://postgres:postgres@localhost:5432/expense_tracker`. Production: your Neon URL. |
-| `CRON_SECRET` | **yes** | Shared secret Vercel Cron sends to the recurring-detection endpoint. |
+| `CRON_SECRET` | **yes** | Shared secret Vercel Cron sends to the recurring-detection endpoint. Use 16+ random characters. Without one, production keeps the endpoint closed. |
 | `DEBUG` | no | `True` for local dev. |
 | `ALLOWED_HOSTS` | no | Defaults to `*` in `.env.example`. |
 | `CORS_ALLOWED_ORIGINS` | no | Comma-separated frontend origins. Defaults to the local Vite dev server. |
@@ -268,7 +268,7 @@ Interactive docs at **`/api/docs/`** (Swagger), JSON schema at `/api/schema/`. E
 
 | Layer | Tech |
 |---|---|
-| **Backend** | Python 3.11, Django 4.2, Django REST Framework, PostgreSQL, `simplejwt`, `drf-spectacular` |
+| **Backend** | Python 3.11, Django 5.2, Django REST Framework, PostgreSQL, `simplejwt`, `drf-spectacular` |
 | **Frontend** | React 19, Vite, React Router, Tailwind CSS v4, Recharts |
 | **Tooling** | pytest, black, isort, flake8, oxlint |
 | **Deployment** | Vercel (serverless Python + static React), Neon Postgres, Vercel Cron |

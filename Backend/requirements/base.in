@@ -1,4 +1,4 @@
-Django>=4.2,<4.3
+Django>=5.2,<5.3
 djangorestframework
 djangorestframework-simplejwt
 django-cors-headers
@@ -11,4 +11,5 @@ whitenoise
 google-auth<2.41
 requests
 # Pure-Python P-256 signature checks for fingerprint sign-in; no compiled wheels needed.
+# pip-audit lists CVE-2024-23342 (a timing attack on signing). The server only verifies, which it doesn't affect.
 ecdsa
