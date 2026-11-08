@@ -1,4 +1,4 @@
-import { apiRequest, clearTokens, setTokens } from "./client"
+import { apiRequest, markSignedIn, signOutOnServer } from "./client"
 
 export async function registerUser({ email, fullName, password }) {
   return apiRequest("/auth/register/", {
@@ -14,7 +14,7 @@ export async function obtainToken({ email, password }) {
     auth: false,
     body: { email, password },
   })
-  setTokens({ access: data.access, refresh: data.refresh })
+  markSignedIn()
   return data
 }
 
@@ -25,14 +25,14 @@ export async function obtainTokenWithGoogle(credential) {
     auth: false,
     body: { credential },
   })
-  setTokens({ access: data.access, refresh: data.refresh })
+  markSignedIn()
   return data
 }
 
 /** Start a private demo: the server creates a fresh account with sample data and signs us in. */
 export async function startDemo() {
   const data = await apiRequest("/auth/demo/", { method: "POST", auth: false })
-  setTokens({ access: data.access, refresh: data.refresh })
+  markSignedIn()
   return data
 }
 
@@ -40,11 +40,9 @@ export async function fetchMe() {
   return apiRequest("/auth/me/")
 }
 
-/** Changing the password ends every session, so keep the new pair the server returns for this one. */
+/** Changing the password ends every session; the server sets fresh cookies for this one. */
 export async function changePassword(payload) {
-  const data = await apiRequest("/auth/password/", { method: "POST", body: payload })
-  setTokens({ access: data.access, refresh: data.refresh })
-  return data
+  return apiRequest("/auth/password/", { method: "POST", body: payload })
 }
 
 export async function forgotPassword(email) {
@@ -56,5 +54,5 @@ export async function resetPassword(payload) {
 }
 
 export function logout() {
-  clearTokens()
+  return signOutOnServer()
 }

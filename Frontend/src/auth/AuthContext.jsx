@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react"
 
 import { changePassword as changePasswordRequest, fetchMe, obtainToken, obtainTokenWithGoogle, registerUser, startDemo } from "../api/auth"
-import { clearTokens, getAccessToken } from "../api/client"
+import { clearTokens, isSignedIn, signOutOnServer } from "../api/client"
 import { clearSignedOut, fingerprintLogin } from "./fingerprint"
 
 const AuthContext = createContext(null)
@@ -12,7 +12,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     async function loadCurrentUser() {
-      if (!getAccessToken()) {
+      if (!isSignedIn()) {
         setLoading(false)
         return
       }
@@ -69,8 +69,8 @@ export function AuthProvider({ children }) {
     setUser(await fetchMe())
   }
 
-  function signOut() {
-    clearTokens()
+  async function signOut() {
+    await signOutOnServer()
     setUser(null)
   }
 

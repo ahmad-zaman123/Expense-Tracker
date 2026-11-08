@@ -16,6 +16,7 @@ from rest_framework.test import APIClient
 from apps.users import passkeys
 from apps.users.constants import DEMO_EMAIL
 from apps.users.models import Passkey, PasskeyChallenge
+from apps.users.test_cookies import tokens_of
 
 User = get_user_model()
 ORIGIN = "http://localhost:5173"
@@ -258,7 +259,7 @@ class TestSignIn:
         anonymous = APIClient(HTTP_ORIGIN=ORIGIN)
         response = sign_in(anonymous, phone)
         assert response.status_code == 200
-        anonymous.credentials(HTTP_AUTHORIZATION="Bearer " + response.json()["access"])
+        anonymous.credentials(HTTP_AUTHORIZATION="Bearer " + tokens_of(response)["access"])
         assert anonymous.get(reverse("me")).json()["email"] == "sam@example.com"
         assert Passkey.objects.get().last_used is not None
 

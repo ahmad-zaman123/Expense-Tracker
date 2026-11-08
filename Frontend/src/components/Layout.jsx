@@ -20,9 +20,9 @@ function Layout() {
   const { user, signOut, changePassword } = useAuth()
   const navigate = useNavigate()
 
-  function handleSignOut() {
+  async function handleSignOut() {
     markSignedOut()
-    signOut()
+    await signOut()
     navigate("/login")
   }
 

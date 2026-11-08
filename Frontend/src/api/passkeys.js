@@ -1,4 +1,4 @@
-import { apiRequest, setTokens } from "./client"
+import { apiRequest, markSignedIn } from "./client"
 
 export const registerOptions = () => apiRequest("/auth/passkey/register/options/", { method: "POST" })
 
@@ -9,7 +9,7 @@ export const loginOptions = () => apiRequest("/auth/passkey/login/options/", { m
 
 export async function loginVerify(credential) {
   const data = await apiRequest("/auth/passkey/login/verify/", { method: "POST", auth: false, body: { credential } })
-  setTokens({ access: data.access, refresh: data.refresh })
+  markSignedIn()
   return data
 }
 

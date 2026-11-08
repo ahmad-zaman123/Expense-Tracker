@@ -73,7 +73,7 @@ make run                        # Swagger at /api/docs/
 ```bash
 cd Frontend
 npm install
-cp .env.example .env            # VITE_API_URL=http://127.0.0.1:8000/api
+cp .env.example .env            # the dev server proxies /api to VITE_API_URL's backend (http://127.0.0.1:8000)
 npm run dev
 ```
 
@@ -99,7 +99,7 @@ cd Backend && make test
 | `GOOGLE_CLIENT_ID` | no | Turns on "Continue with Google" on the sign-in page. See **Google sign-in** below. |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `EMAIL_FROM` | no | Turn on **Forgot password?**. See **Password reset** below. |
 
-Frontend: `VITE_API_URL` points at the backend's `/api`; `VITE_GOOGLE_CLIENT_ID` is the same Google client id, only needed for the Google button.
+Frontend: `VITE_API_URL` is the backend's `/api`, which the Vite dev server proxies to. It isn't used in production: there `Frontend/vercel.json` rewrites `/api/*` to the backend, so the login cookies belong to the site itself. `VITE_GOOGLE_CLIENT_ID` is the same Google client id, only needed for the Google button.
 
 </details>
 
@@ -252,11 +252,11 @@ Rows that repeat an earlier import are skipped, and rows with a bad date, amount
 
 ## 🔌 API
 
-Interactive docs at **`/api/docs/`** (Swagger), JSON schema at `/api/schema/`. Everything needs a JWT except registration, login and starting a demo; the internal endpoint uses a shared secret instead.
+Interactive docs at **`/api/docs/`** (Swagger), JSON schema at `/api/schema/`. Everything needs a JWT except registration, login and starting a demo. The site keeps it in httpOnly cookies (`access_token`, `refresh_token`) that page scripts can't read; an `Authorization: Bearer` header works too. The internal endpoint uses a shared secret instead.
 
 | Area | Endpoints |
 |---|---|
-| **Auth** | `POST /api/auth/register/`, `/auth/demo/`, `/auth/token/`, `/auth/token/refresh/`, `/auth/google/`, `/auth/password/`, `GET /auth/me/` |
+| **Auth** | `POST /api/auth/register/`, `/auth/demo/`, `/auth/token/`, `/auth/token/refresh/`, `/auth/logout/`, `/auth/google/`, `/auth/password/`, `GET /auth/me/` |
 | **Fingerprint** | `POST /api/auth/passkey/register/options/` and `/verify/` (signed in), `POST /api/auth/passkey/login/options/` and `/verify/`, `GET /api/auth/passkeys/`, `DELETE /api/auth/passkeys/<id>/` |
 | **Finance** | `/api/accounts/`, `/categories/`, `/budgets/`, `/transactions/`, `/transfers/` (list, create, detail) |
 | **Import** | `POST /api/transactions/import/` |
